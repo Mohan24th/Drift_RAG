@@ -10,14 +10,35 @@ def test_load_text_file():
 
 
 def test_chunk_text():
-    text = "abcdefghijklmnopqrstuvwxyz"
-
-    chunks = chunk_text(
-        text,
-        chunk_size=10,
-        chunk_overlap=2,
+    text = (
+        "First paragraph.\n\n"
+        "Second paragraph.\n\n"
+        "Third paragraph."
     )
 
-    assert len(chunks) > 1
-    assert chunks[0] == "abcdefghij"
-    assert chunks[1] == "ijklmnopqr"
+    chunks = chunk_text(
+        text=text,
+        source="test.txt",
+        version="v1",
+        chunk_size=35,
+    )
+
+    assert len(chunks) == 2
+
+    assert chunks[0].version == "v1"
+    assert chunks[0].source == "test.txt"
+    assert chunks[0].chunk_index == 0
+    assert chunks[0].text == "First paragraph.\n\nSecond paragraph."
+
+    assert chunks[1].chunk_index == 1
+    assert chunks[1].text == "Third paragraph."
+
+
+def test_empty_text():
+    chunks = chunk_text(
+        text="",
+        source="test.txt",
+        version="v1",
+    )
+
+    assert chunks == []
