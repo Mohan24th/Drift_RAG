@@ -2,3 +2,8 @@ sentence-transformers
 faiss-cpu
 numpy
 pypdf
+sqlalchemy
+psycopg[binary]
+pgvector
+python-dotenv
+psycopg2
