@@ -22,6 +22,7 @@ class PgRetriever:
         self,
         query: str,
         top_k: int = 3,
+        version_id: str | None = None,
     ):
         query_embedding = self.embedding_model.encode(
             [query]
@@ -50,6 +51,15 @@ class PgRetriever:
                 DocumentVersionModel.document_id
                 == DocumentModel.id,
             )
+        )
+
+        if version_id is not None:
+            statement = statement.where(
+                DocumentVersionModel.id == version_id
+            )
+
+        statement = (
+            statement
             .order_by(distance)
             .limit(top_k)
         )

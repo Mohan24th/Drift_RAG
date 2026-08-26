@@ -20,15 +20,24 @@ class DriftAnalyzer:
         v2_results,
     ) -> DriftReport:
 
+        # Use chunk_index as the logical identity
+        # across document versions.
+        #
+        # Database UUIDs are unique per row, so the
+        # UUID of V1 chunk 0 will differ from V2 chunk 0.
         v1_ids = [
-            chunk.chunk_id
+            chunk.chunk_index
             for chunk, _ in v1_results
         ]
 
         v2_ids = [
-            chunk.chunk_id
+            chunk.chunk_index
             for chunk, _ in v2_results
         ]
+
+        # -----------------------------
+        # Retrieval drift
+        # -----------------------------
 
         retrieval_overlap = top_k_overlap(
             v1_ids,
@@ -40,8 +49,14 @@ class DriftAnalyzer:
             v2_ids,
         )
 
-        v2_by_id = {
-            chunk.chunk_id: chunk
+        # -----------------------------
+        # Content drift
+        # -----------------------------
+
+        # Match V1 and V2 chunks using their
+        # logical position within the document.
+        v2_by_index = {
+            chunk.chunk_index: chunk
             for chunk, _ in v2_results
         }
 
@@ -52,8 +67,8 @@ class DriftAnalyzer:
             v1_results,
             start=1,
         ):
-            v2_chunk = v2_by_id.get(
-                v1_chunk.chunk_id
+            v2_chunk = v2_by_index.get(
+                v1_chunk.chunk_index
             )
 
             if v2_chunk is None:
@@ -64,6 +79,7 @@ class DriftAnalyzer:
                 v2_chunk.text,
             )
 
+            # Higher-ranked results have more influence.
             weight = 1.0 / rank
 
             weighted_changes.append(
@@ -78,7 +94,13 @@ class DriftAnalyzer:
                 / total_weight
             )
         else:
+            # No matching chunks means maximum
+            # content uncertainty/change.
             semantic_change = 1.0
+
+        # -----------------------------
+        # Final report
+        # -----------------------------
 
         return DriftReport(
             query=query,

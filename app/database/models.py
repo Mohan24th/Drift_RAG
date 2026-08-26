@@ -115,3 +115,8 @@ class ChunkModel(Base):
     version: Mapped["DocumentVersionModel"] = relationship(
         back_populates="chunks",
     )
+
+
+    @property
+    def chunk_id(self) -> str:
+        return self.id

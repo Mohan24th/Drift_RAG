@@ -25,5 +25,7 @@ experiments/*
 # Runtime document storage
 data/documents/
 
+data/test_documents/
+
 .env
 .env.*

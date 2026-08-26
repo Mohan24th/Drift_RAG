@@ -4,7 +4,6 @@ from app.retrieval.pg_retriever import PgRetriever
 
 
 def main():
-
     session = SessionLocal()
 
     try:
@@ -13,6 +12,11 @@ def main():
         retriever = PgRetriever(
             session=session,
             embedding_model=embedding_model,
+        )
+
+        # Current active version: V2
+        version_id = (
+            "32bca701-1a13-4e66-a451-1061f0faa20a"
         )
 
         queries = [
@@ -28,15 +32,23 @@ def main():
             results = retriever.retrieve(
                 query,
                 top_k=3,
+                version_id=version_id,
             )
 
-            for rank, (chunk, score) in enumerate(
+            for rank, (
+                chunk,
+                version,
+                document,
+                score,
+            ) in enumerate(
                 results,
                 start=1,
             ):
                 print(
                     f"\n{rank}. "
-                    f"{chunk.id} "
+                    f"{document.name} "
+                    f"v{version.version_number} "
+                    f"chunk={chunk.chunk_index} "
                     f"score={score:.4f}"
                 )
 

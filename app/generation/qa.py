@@ -18,12 +18,14 @@ class RAGAnswerer:
     def answer(
         self,
         question: str,
+        version_id: str,
         top_k: int = 3,
     ) -> RAGResponse:
 
         results = self.retriever.retrieve(
             question,
             top_k=top_k,
+            version_id=version_id,
         )
 
         if not results:

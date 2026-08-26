@@ -42,15 +42,22 @@ class DocumentRepository:
 
         return chunks
 
-    def get_document(
+    def get_document_by_name(
         self,
-        document_id: str,
+        name: str,
     ) -> DocumentModel | None:
 
-        return self.session.get(
-            DocumentModel,
-            document_id,
+        statement = (
+            select(DocumentModel)
+            .where(
+                DocumentModel.name == name
+            )
+            .limit(1)
         )
+
+        return self.session.execute(
+            statement
+        ).scalar_one_or_none()
 
     def get_latest_version(
         self,
