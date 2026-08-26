@@ -1,7 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.database.models import ChunkModel
+from app.database.models import (
+    ChunkModel,
+    DocumentModel,
+    DocumentVersionModel,
+)
 from app.retrieval.embeddings import EmbeddingModel
 
 
@@ -18,28 +22,35 @@ class PgRetriever:
         self,
         query: str,
         top_k: int = 3,
-    ) -> list[tuple[ChunkModel, float]]:
-
+    ):
         query_embedding = self.embedding_model.encode(
             [query]
         )[0].tolist()
 
-        similarity = (
-            1 - ChunkModel.embedding.cosine_distance(
-                query_embedding
-            )
+        distance = ChunkModel.embedding.cosine_distance(
+            query_embedding
         )
+
+        similarity = 1 - distance
 
         statement = (
             select(
                 ChunkModel,
+                DocumentVersionModel,
+                DocumentModel,
                 similarity.label("score"),
             )
-            .order_by(
-                ChunkModel.embedding.cosine_distance(
-                    query_embedding
-                )
+            .join(
+                DocumentVersionModel,
+                ChunkModel.version_id
+                == DocumentVersionModel.id,
             )
+            .join(
+                DocumentModel,
+                DocumentVersionModel.document_id
+                == DocumentModel.id,
+            )
+            .order_by(distance)
             .limit(top_k)
         )
 
@@ -48,6 +59,16 @@ class PgRetriever:
         ).all()
 
         return [
-            (chunk, float(score))
-            for chunk, score in results
+            (
+                chunk,
+                version,
+                document,
+                float(score),
+            )
+            for (
+                chunk,
+                version,
+                document,
+                score,
+            ) in results
         ]

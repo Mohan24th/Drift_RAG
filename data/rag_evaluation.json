@@ -1,0 +1,29 @@
+[
+    {
+        "question": "How many vacation days do employees get?",
+        "expected_answer_contains": ["20 days"]
+    },
+    {
+        "question": "How much annual leave is provided each year?",
+        "expected_answer_contains": ["20 days"]
+    },
+    {
+        "question": "How far in advance should leave be requested?",
+        "expected_answer_contains": ["3 days"]
+    },
+    {
+        "question": "Who is responsible for approving leave?",
+        "expected_answer_contains": ["Managers"]
+    },
+    {
+        "question": "Can unused annual leave be carried forward?",
+        "expected_answer_contains": ["carried forward"]
+    },
+    {
+        "question": "What is the company's remote work policy?",
+        "expected_answer_contains": [
+            "don't have enough information",
+            "not enough information"
+        ]
+    }
+]

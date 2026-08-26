@@ -7,3 +7,4 @@ psycopg[binary]
 pgvector
 python-dotenv
 psycopg2
+groq
