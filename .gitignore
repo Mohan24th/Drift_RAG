@@ -1,15 +1,23 @@
+# Virtual environment
 .venv/
+
+# Python
 __pycache__/
 *.py[cod]
-.env
-.DS_Store
+*.pyo
 
-experiments/*
-!experiments/.gitkeep
-
-data/*
-!data/v1/
-!data/v2/
-
+# Testing / coverage
 .pytest_cache/
 .coverage
+htmlcov/
+
+# Environment / secrets
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# Experiment outputs
+experiments/*
+!experiments/.gitkeep

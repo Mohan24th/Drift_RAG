@@ -1,17 +1,43 @@
 # Drift RAG
 
-Retrieval drift detection for continually-updated document corpora.
+Drift RAG is a version-aware Retrieval-Augmented Generation system for
+company knowledge bases.
 
-## Goal
+The system answers questions from company documents while detecting
+whether changes between document versions affect retrieval behavior or
+the information being retrieved.
 
-Measure how changes in a document corpus affect RAG retrieval behavior.
+## Core Problem
 
-## Core Pipeline
+Traditional RAG systems can continue operating after company documents
+change without showing whether the knowledge used for answering questions
+has changed.
 
-Documents V1/V2
-→ Chunking
-→ Embeddings
-→ Vector Search
-→ Retrieval Evaluation
-→ Drift Detection
-→ Drift Report
+Drift RAG compares document versions and measures:
+
+- Retrieval-set drift
+- Retrieval ranking drift
+- Semantic/content drift
+
+This allows organizations to identify queries affected by changes in
+their knowledge base.
+
+## Current Architecture
+
+```text
+Documents
+    ↓
+Ingestion
+    ↓
+Chunking
+    ↓
+Embeddings
+    ↓
+FAISS Vector Search
+    ↓
+Retrieval
+    ↓
+Drift Analysis
+    ├── Retrieval overlap
+    ├── Rank change
+    └── Semantic change

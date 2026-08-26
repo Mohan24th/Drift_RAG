@@ -1,19 +1,9 @@
-from dataclasses import dataclass
-
+from app.drift.report import DriftReport
 from app.drift.metrics import (
     top_k_overlap,
     mean_rank_change,
 )
 from app.drift.semantic import SemanticDrift
-from app.drift.report import DriftReport
-
-
-@dataclass
-class DriftResult:
-    query: str
-    retrieval_overlap: float
-    rank_change: float
-    semantic_change: float
 
 
 class DriftAnalyzer:
@@ -28,7 +18,7 @@ class DriftAnalyzer:
         query: str,
         v1_results,
         v2_results,
-    ) -> DriftResult:
+    ) -> DriftReport:
 
         v1_ids = [
             chunk.chunk_id
@@ -50,15 +40,18 @@ class DriftAnalyzer:
             v2_ids,
         )
 
-        semantic_changes = []
-
         v2_by_id = {
             chunk.chunk_id: chunk
             for chunk, _ in v2_results
         }
 
-        for v1_chunk, _ in v1_results:
+        weighted_changes = []
+        total_weight = 0.0
 
+        for rank, (v1_chunk, _) in enumerate(
+            v1_results,
+            start=1,
+        ):
             v2_chunk = v2_by_id.get(
                 v1_chunk.chunk_id
             )
@@ -71,20 +64,28 @@ class DriftAnalyzer:
                 v2_chunk.text,
             )
 
-            semantic_changes.append(change)
+            weight = 1.0 / rank
 
-        if semantic_changes:
+            weighted_changes.append(
+                change * weight
+            )
+
+            total_weight += weight
+
+        if total_weight > 0:
             semantic_change = (
-                sum(semantic_changes)
-                / len(semantic_changes)
+                sum(weighted_changes)
+                / total_weight
             )
         else:
             semantic_change = 1.0
 
         return DriftReport(
-        query=query,
-        retrieval_overlap=retrieval_overlap,
-        rank_change=rank_change,
-        semantic_change=semantic_change,
+            query=query,
+            retrieval_overlap=retrieval_overlap,
+            rank_change=rank_change,
+            semantic_change=max(
+                0.0,
+                semantic_change,
+            ),
         )
-        

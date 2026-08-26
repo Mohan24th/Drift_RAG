@@ -1,0 +1,18 @@
+[
+    {
+        "query": "How many vacation days do employees get?",
+        "expected_chunk": "v1-0"
+    },
+    {
+        "query": "When should employees request leave?",
+        "expected_chunk": "v1-1"
+    },
+    {
+        "query": "Can unused leave be carried forward?",
+        "expected_chunk": "v1-2"
+    },
+    {
+        "query": "Who approves leave requests?",
+        "expected_chunk": "v1-3"
+    }
+]

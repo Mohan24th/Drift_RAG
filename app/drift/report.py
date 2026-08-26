@@ -12,37 +12,44 @@ class DriftReport:
     @property
     def retrieval_drift(self) -> float:
         """
-        Higher value means retrieval behavior
-        changed more between corpus versions.
+        Measures change in retrieval behavior.
+
+        Combines:
+        - top-k retrieval-set change
+        - ranking change
         """
 
         overlap_drift = 1.0 - self.retrieval_overlap
 
         return (
-            overlap_drift + self.rank_change
+            overlap_drift
+            + self.rank_change
         ) / 2
 
     @property
     def content_drift(self) -> float:
         """
-        Higher value means the content of corresponding
-        retrieved chunks changed more.
-        """
-
-        return max(0.0, self.semantic_change)
-    @property
-    def overall_drift(self) -> float:
-        """
-        Combined drift score.
-
-        Retrieval behavior and content change are
-        weighted equally for the initial version.
+        Measures semantic change in corresponding
+        retrieved chunks.
         """
 
         return max(
             0.0,
-            (
-                self.retrieval_drift
-                + self.content_drift
-            ) / 2,
+            self.semantic_change,
         )
+
+    @property
+    def composite_drift_score(self) -> float:
+        """
+        Initial heuristic combining retrieval
+        and content drift.
+
+        This score is intended for relative comparison
+        between corpus versions, not as an absolute
+        probability or universally calibrated measure.
+        """
+
+        return (
+            self.retrieval_drift
+            + self.content_drift
+        ) / 2
