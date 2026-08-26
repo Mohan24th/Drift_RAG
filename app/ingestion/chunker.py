@@ -58,7 +58,7 @@ def chunk_text(
 
             chunks.append(
                 Chunk(
-                    chunk_id=f"{version}-{chunk_index}",
+                    chunk_id=f"{source}-{chunk_index}",
                     text=chunk_text_value,
                     source=source,
                     version=version,
@@ -78,7 +78,7 @@ def chunk_text(
 
         chunks.append(
             Chunk(
-                chunk_id=f"{version}-{chunk_index}",
+                chunk_id=f"{source}-{chunk_index}",
                 text=chunk_text_value,
                 source=source,
                 version=version,
