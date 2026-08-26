@@ -21,3 +21,6 @@ htmlcov/
 # Experiment outputs
 experiments/*
 !experiments/.gitkeep
+
+# Runtime document storage
+data/documents/
