@@ -41,8 +41,6 @@ class DocumentService:
             )
 
         try:
-            # 1. Find existing document
-            #    or create a new one.
             document = (
                 self.repository.get_document_by_name(
                     document_name
@@ -59,7 +57,6 @@ class DocumentService:
                     document
                 )
 
-            # 2. Create new version
             version = DocumentVersionModel(
                 id=str(uuid4()),
                 document_id=document.id,
@@ -71,7 +68,6 @@ class DocumentService:
                 version
             )
 
-            # 3. Extract and chunk
             chunks = self.ingestion_service.ingest(
                 file_path=str(path),
                 source=path.name,
@@ -84,12 +80,10 @@ class DocumentService:
                     "No chunks were created from the document"
                 )
 
-            # 4. Generate embeddings
             embeddings = self.embedding_model.encode(
                 [chunk.text for chunk in chunks]
             )
 
-            # 5. Convert chunks to database models
             chunk_models = []
 
             for chunk, embedding in zip(
@@ -106,12 +100,10 @@ class DocumentService:
                     )
                 )
 
-            # 6. Persist chunks
             self.repository.create_chunks(
                 chunk_models
             )
 
-            # 7. Commit entire operation
             self.session.commit()
 
             return {
@@ -123,6 +115,16 @@ class DocumentService:
         except Exception:
             self.session.rollback()
             raise
+
+    def get_document(
+        self,
+        document_id: str,
+    ) -> DocumentModel | None:
+
+        return self.session.get(
+            DocumentModel,
+            document_id,
+        )
 
     def get_latest_version(
         self,

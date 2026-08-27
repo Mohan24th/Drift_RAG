@@ -23,7 +23,7 @@ class RAGAnswerer:
     ) -> RAGResponse:
 
         results = self.retriever.retrieve(
-            question,
+            query=question,
             top_k=top_k,
             version_id=version_id,
         )
@@ -45,8 +45,10 @@ class RAGAnswerer:
             version,
             document,
             score,
-        ) in enumerate(results, start=1):
-
+        ) in enumerate(
+            results,
+            start=1,
+        ):
             context_parts.append(
                 f"[Context {rank}]\n"
                 f"{chunk.text}"
