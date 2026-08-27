@@ -25,7 +25,5 @@ experiments/*
 # Runtime document storage
 data/documents/
 
+# Local test documents
 data/test_documents/
-
-.env
-.env.*

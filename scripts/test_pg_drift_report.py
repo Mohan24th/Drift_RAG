@@ -52,27 +52,31 @@ def main():
             "647e4ef2-d359-4a93-8a27-f4bece148ee1"
         )
 
+        v1_number = 1
+        v2_number = 3
+
         reports = []
 
         for query in QUERIES:
             report = service.analyze(
                 document_id=document_id,
-                v1_number=1,
-                v2_number=2,
+                v1_number=v1_number,
+                v2_number=v2_number,
                 query=query,
                 top_k=3,
             )
 
             reports.append(report)
 
-        summary = create_summary(
-            reports
-        )
+        summary = create_summary(reports)
 
         print()
         print("=" * 60)
         print("DRIFT REPORT")
-        print("Leave Policy: V1 → V2")
+        print(
+            f"Leave Policy: "
+            f"V{v1_number} → V{v2_number}"
+        )
         print("=" * 60)
 
         print()
@@ -112,6 +116,11 @@ def main():
                 report.semantic_change
             )
 
+            overall_drift = (
+                retrieval_drift
+                + content_drift
+            ) / 2
+
             print()
             print(
                 f"{index}. {report.query}"
@@ -129,7 +138,7 @@ def main():
 
             print(
                 f"   Overall drift:   "
-                f"{(retrieval_drift + content_drift) / 2:.4f}"
+                f"{overall_drift:.4f}"
             )
 
     finally:

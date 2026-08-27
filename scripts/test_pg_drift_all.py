@@ -53,13 +53,13 @@ def main():
             "647e4ef2-d359-4a93-8a27-f4bece148ee1"
         )
 
-        print("\n=== PostgreSQL V1 → V2 Drift ===\n")
+        print("\n=== PostgreSQL V1 → V3 Drift ===\n")
 
         for query in QUERIES:
             report = drift_service.analyze(
                 document_id=document_id,
                 v1_number=1,
-                v2_number=2,
+                v2_number=3,
                 query=query,
                 top_k=3,
             )
