@@ -1,15 +1,26 @@
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    UploadFile,
+)
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from app.api.dependencies import get_db
+from app.api.dependencies import (
+    get_db,
+    get_document_service,
+)
 from app.database.document_service import DocumentService
-from app.database.repositories.documents import DocumentRepository
-from app.ingestion.service import IngestionService
-from app.retrieval.embeddings import EmbeddingModel
+from app.database.models import DocumentModel
+from app.database.repositories.documents import (
+    DocumentRepository,
+)
 
 
 router = APIRouter()
@@ -34,26 +45,6 @@ class VersionResponse(BaseModel):
     chunks_created: int
 
 
-def get_document_service(
-    session: Session,
-) -> DocumentService:
-
-    repository = DocumentRepository(
-        session=session,
-    )
-
-    ingestion_service = IngestionService()
-
-    embedding_model = EmbeddingModel()
-
-    return DocumentService(
-        repository=repository,
-        ingestion_service=ingestion_service,
-        embedding_model=embedding_model,
-        session=session,
-    )
-
-
 @router.post(
     "/",
     response_model=DocumentResponse,
@@ -62,31 +53,39 @@ def create_document(
     request: CreateDocumentRequest,
     session: Session = Depends(get_db),
 ):
+    name = request.name.strip()
+
+    if not name:
+        raise HTTPException(
+            status_code=400,
+            detail="Document name cannot be empty.",
+        )
+
     repository = DocumentRepository(
-        session=session,
+        session=session
     )
 
     existing = repository.get_document_by_name(
-        request.name
+        name
     )
 
     if existing is not None:
         raise HTTPException(
             status_code=409,
-            detail="A document with this name already exists.",
+            detail=(
+                "A document with this name "
+                "already exists."
+            ),
         )
 
     from uuid import uuid4
 
-    from app.database.models import DocumentModel
-
     document = DocumentModel(
         id=str(uuid4()),
-        name=request.name.strip(),
+        name=name,
     )
 
     repository.create_document(document)
-
     session.commit()
 
     return DocumentResponse(
@@ -104,21 +103,17 @@ async def upload_document_version(
     file: UploadFile = File(...),
     version_number: int = Form(..., gt=0),
     session: Session = Depends(get_db),
+    service: DocumentService = Depends(
+        get_document_service
+    ),
 ):
     repository = DocumentRepository(
-        session=session,
+        session=session
     )
 
-    
-    # Resolve document directly by ID.
-    from sqlalchemy import select
-    from app.database.models import DocumentModel
-
-    document = session.execute(
-        select(DocumentModel).where(
-            DocumentModel.id == document_id
-        )
-    ).scalar_one_or_none()
+    document = repository.get_document_by_id(
+        document_id
+    )
 
     if document is None:
         raise HTTPException(
@@ -132,12 +127,25 @@ async def upload_document_version(
             detail="A file is required.",
         )
 
-    suffix = Path(file.filename).suffix.lower()
+    suffix = Path(
+        file.filename
+    ).suffix.lower()
 
     if suffix not in {".pdf", ".txt"}:
         raise HTTPException(
             status_code=400,
-            detail="Only PDF and TXT files are supported.",
+            detail=(
+                "Only PDF and TXT files "
+                "are supported."
+            ),
+        )
+
+    content = await file.read()
+
+    if not content:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded file is empty.",
         )
 
     temp_path = None
@@ -148,15 +156,8 @@ async def upload_document_version(
             suffix=suffix,
         ) as temp_file:
 
-            content = await file.read()
-
             temp_file.write(content)
-
             temp_path = temp_file.name
-
-        service = get_document_service(
-            session
-        )
 
         result = service.ingest_document(
             file_path=temp_path,
@@ -168,7 +169,9 @@ async def upload_document_version(
             document_id=document.id,
             version_id=result["version"].id,
             version_number=result["version"].version_number,
-            chunks_created=len(result["chunks"]),
+            chunks_created=len(
+                result["chunks"]
+            ),
         )
 
     except ValueError as exc:

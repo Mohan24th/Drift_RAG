@@ -59,6 +59,23 @@ class DocumentRepository:
             statement
         ).scalar_one_or_none()
 
+    def get_document_by_id(
+        self,
+        document_id: str,
+    ) -> DocumentModel | None:
+
+        statement = (
+            select(DocumentModel)
+            .where(
+                DocumentModel.id == document_id
+            )
+            .limit(1)
+        )
+
+        return self.session.execute(
+            statement
+        ).scalar_one_or_none()
+
     def get_latest_version(
         self,
         document_id: str,
@@ -72,6 +89,27 @@ class DocumentRepository:
             )
             .order_by(
                 DocumentVersionModel.version_number.desc()
+            )
+            .limit(1)
+        )
+
+        return self.session.execute(
+            statement
+        ).scalar_one_or_none()
+
+    def get_version(
+        self,
+        document_id: str,
+        version_number: int,
+    ) -> DocumentVersionModel | None:
+
+        statement = (
+            select(DocumentVersionModel)
+            .where(
+                DocumentVersionModel.document_id
+                == document_id,
+                DocumentVersionModel.version_number
+                == version_number,
             )
             .limit(1)
         )

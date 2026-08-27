@@ -40,7 +40,13 @@ class DocumentService:
                 f"File not found: {path}"
             )
 
+        if version_number <= 0:
+            raise ValueError(
+                "Version number must be greater than 0."
+            )
+
         try:
+            # 1. Find existing document
             document = (
                 self.repository.get_document_by_name(
                     document_name
@@ -57,6 +63,38 @@ class DocumentService:
                     document
                 )
 
+            # 2. Validate version
+            existing_version = (
+                self.repository.get_version(
+                    document_id=document.id,
+                    version_number=version_number,
+                )
+            )
+
+            if existing_version is not None:
+                raise ValueError(
+                    f"Version v{version_number} already exists "
+                    f"for document '{document.name}'."
+                )
+
+            latest_version = (
+                self.repository.get_latest_version(
+                    document.id
+                )
+            )
+
+            if (
+                latest_version is not None
+                and version_number
+                <= latest_version.version_number
+            ):
+                raise ValueError(
+                    f"Version v{version_number} must be greater "
+                    f"than the latest version "
+                    f"v{latest_version.version_number}."
+                )
+
+            # 3. Create new version
             version = DocumentVersionModel(
                 id=str(uuid4()),
                 document_id=document.id,
@@ -68,6 +106,7 @@ class DocumentService:
                 version
             )
 
+            # 4. Extract and chunk
             chunks = self.ingestion_service.ingest(
                 file_path=str(path),
                 source=path.name,
@@ -77,13 +116,15 @@ class DocumentService:
 
             if not chunks:
                 raise ValueError(
-                    "No chunks were created from the document"
+                    "No chunks were created from the document."
                 )
 
+            # 5. Generate embeddings
             embeddings = self.embedding_model.encode(
                 [chunk.text for chunk in chunks]
             )
 
+            # 6. Convert chunks to database models
             chunk_models = []
 
             for chunk, embedding in zip(
@@ -100,10 +141,12 @@ class DocumentService:
                     )
                 )
 
+            # 7. Persist chunks
             self.repository.create_chunks(
                 chunk_models
             )
 
+            # 8. Commit entire operation
             self.session.commit()
 
             return {
@@ -119,12 +162,18 @@ class DocumentService:
     def get_document(
         self,
         document_id: str,
-    ) -> DocumentModel | None:
+    ) -> DocumentModel:
 
-        return self.session.get(
-            DocumentModel,
-            document_id,
+        document = self.repository.get_document_by_id(
+            document_id
         )
+
+        if document is None:
+            raise ValueError(
+                f"Document not found: {document_id}"
+            )
+
+        return document
 
     def get_latest_version(
         self,

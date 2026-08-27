@@ -1,29 +1,21 @@
-import os
-
-from dotenv import load_dotenv
 from groq import Groq
 
-
-load_dotenv()
+from app.config import settings
 
 
 class LLM:
     def __init__(
         self,
-        model: str = "openai/gpt-oss-20b",
+        model: str | None = None,
     ):
-        api_key = os.getenv("GROQ_API_KEY")
-
-        if not api_key:
-            raise RuntimeError(
-                "GROQ_API_KEY is not set"
-            )
-
         self.client = Groq(
-            api_key=api_key
+            api_key=settings.groq_api_key
         )
 
-        self.model = model
+        self.model = (
+            model
+            or settings.llm_model
+        )
 
     def generate(
         self,
@@ -41,4 +33,11 @@ class LLM:
             temperature=0,
         )
 
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+
+        if not content:
+            raise RuntimeError(
+                "LLM returned an empty response"
+            )
+
+        return content

@@ -94,7 +94,7 @@ def query_document(
 
         response = service.answer(
             document_id=document_id,
-            question=request.question,
+            question=request.question.strip(),
             top_k=request.top_k,
         )
 
