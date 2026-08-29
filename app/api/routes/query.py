@@ -4,17 +4,9 @@ from fastapi import (
     HTTPException,
 )
 from pydantic import BaseModel, Field
-from sqlalchemy.orm import Session
 
-from app.api.dependencies import get_db
-from app.database.document_service import DocumentService
-from app.database.repositories.documents import DocumentRepository
-from app.generation.llm import LLM
-from app.generation.qa import RAGAnswerer
+from app.api.dependencies import get_rag_service
 from app.generation.service import RAGService
-from app.ingestion.service import IngestionService
-from app.retrieval.embeddings import EmbeddingModel
-from app.retrieval.pg_retriever import PgRetriever
 
 
 router = APIRouter()
@@ -46,37 +38,6 @@ class QueryResponse(BaseModel):
     sources: list[SourceResponse]
 
 
-def build_rag_service(
-    session: Session,
-) -> RAGService:
-
-    repository = DocumentRepository(
-        session=session,
-    )
-
-    document_service = DocumentService(
-        repository=repository,
-        ingestion_service=IngestionService(),
-        embedding_model=EmbeddingModel(),
-        session=session,
-    )
-
-    retriever = PgRetriever(
-        session=session,
-        embedding_model=document_service.embedding_model,
-    )
-
-    answerer = RAGAnswerer(
-        retriever=retriever,
-        llm=LLM(),
-    )
-
-    return RAGService(
-        document_service=document_service,
-        answerer=answerer,
-    )
-
-
 @router.post(
     "/{document_id}/query",
     response_model=QueryResponse,
@@ -84,17 +45,23 @@ def build_rag_service(
 def query_document(
     document_id: str,
     request: QueryRequest,
-    session: Session = Depends(get_db),
+    service: RAGService = Depends(
+        get_rag_service
+    ),
 ):
 
-    try:
-        service = build_rag_service(
-            session
+    question = request.question.strip()
+
+    if not question:
+        raise HTTPException(
+            status_code=422,
+            detail="Question cannot be empty.",
         )
 
+    try:
         response = service.answer(
             document_id=document_id,
-            question=request.question.strip(),
+            question=question,
             top_k=request.top_k,
         )
 

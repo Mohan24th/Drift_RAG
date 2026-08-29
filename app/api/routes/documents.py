@@ -1,5 +1,4 @@
 from pathlib import Path
-from tempfile import NamedTemporaryFile
 
 from fastapi import (
     APIRouter,
@@ -16,14 +15,15 @@ from app.api.dependencies import (
     get_db,
     get_document_service,
 )
-from app.database.document_service import DocumentService
 from app.database.models import DocumentModel
-from app.database.repositories.documents import (
-    DocumentRepository,
-)
+from app.database.repositories.documents import DocumentRepository
+from app.database.document_service import DocumentService
 
 
 router = APIRouter()
+
+
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 
 class CreateDocumentRequest(BaseModel):
@@ -53,6 +53,10 @@ def create_document(
     request: CreateDocumentRequest,
     session: Session = Depends(get_db),
 ):
+    repository = DocumentRepository(
+        session=session,
+    )
+
     name = request.name.strip()
 
     if not name:
@@ -61,10 +65,6 @@ def create_document(
             detail="Document name cannot be empty.",
         )
 
-    repository = DocumentRepository(
-        session=session
-    )
-
     existing = repository.get_document_by_name(
         name
     )
@@ -72,10 +72,7 @@ def create_document(
     if existing is not None:
         raise HTTPException(
             status_code=409,
-            detail=(
-                "A document with this name "
-                "already exists."
-            ),
+            detail="A document with this name already exists.",
         )
 
     from uuid import uuid4
@@ -86,6 +83,7 @@ def create_document(
     )
 
     repository.create_document(document)
+
     session.commit()
 
     return DocumentResponse(
@@ -103,12 +101,12 @@ async def upload_document_version(
     file: UploadFile = File(...),
     version_number: int = Form(..., gt=0),
     session: Session = Depends(get_db),
-    service: DocumentService = Depends(
+    document_service: DocumentService = Depends(
         get_document_service
     ),
 ):
     repository = DocumentRepository(
-        session=session
+        session=session,
     )
 
     document = repository.get_document_by_id(
@@ -134,32 +132,50 @@ async def upload_document_version(
     if suffix not in {".pdf", ".txt"}:
         raise HTTPException(
             status_code=400,
-            detail=(
-                "Only PDF and TXT files "
-                "are supported."
-            ),
-        )
-
-    content = await file.read()
-
-    if not content:
-        raise HTTPException(
-            status_code=400,
-            detail="Uploaded file is empty.",
+            detail="Only PDF and TXT files are supported.",
         )
 
     temp_path = None
+    total_size = 0
 
     try:
+        from tempfile import NamedTemporaryFile
+
         with NamedTemporaryFile(
             delete=False,
             suffix=suffix,
         ) as temp_file:
 
-            temp_file.write(content)
+            while True:
+                chunk = await file.read(
+                    1024 * 1024
+                )
+
+                if not chunk:
+                    break
+
+                total_size += len(chunk)
+
+                if total_size > MAX_FILE_SIZE:
+                    raise HTTPException(
+                        status_code=413,
+                        detail=(
+                            "File size exceeds "
+                            "the 10 MB limit."
+                        ),
+                    )
+
+                temp_file.write(chunk)
+
             temp_path = temp_file.name
 
-        result = service.ingest_document(
+        if total_size == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Uploaded file is empty.",
+            )
+
+        result = document_service.ingest_document(
             file_path=temp_path,
             document_name=document.name,
             version_number=version_number,
@@ -169,10 +185,11 @@ async def upload_document_version(
             document_id=document.id,
             version_id=result["version"].id,
             version_number=result["version"].version_number,
-            chunks_created=len(
-                result["chunks"]
-            ),
+            chunks_created=len(result["chunks"]),
         )
+
+    except HTTPException:
+        raise
 
     except ValueError as exc:
         raise HTTPException(
@@ -185,3 +202,5 @@ async def upload_document_version(
             Path(temp_path).unlink(
                 missing_ok=True
             )
+
+        await file.close()

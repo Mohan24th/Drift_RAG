@@ -1,18 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+)
 from pydantic import BaseModel, Field
-from sqlalchemy.orm import Session
 
-from app.api.dependencies import get_db
-from app.database.document_service import DocumentService
-from app.database.repositories.documents import DocumentRepository
-from app.drift.analyzer import DriftAnalyzer
-from app.drift.retrieval import DriftRetriever
-from app.drift.semantic import SemanticDrift
+from app.api.dependencies import get_drift_service
 from app.drift.service import DriftService
 from app.drift.summary import create_summary
-from app.drift.version_loader import VersionLoader
-from app.retrieval.embeddings import EmbeddingModel
-from app.retrieval.pg_retriever import PgRetriever
 
 
 router = APIRouter()
@@ -57,49 +52,6 @@ class DriftResponse(BaseModel):
     reports: list[DriftReportResponse]
 
 
-def build_drift_service(
-    session: Session,
-) -> DriftService:
-
-    repository = DocumentRepository(
-        session=session,
-    )
-
-    document_service = DocumentService(
-        repository=repository,
-        ingestion_service=None,
-        embedding_model=None,
-        session=session,
-    )
-
-    embedding_model = EmbeddingModel()
-
-    retriever = PgRetriever(
-        session=session,
-        embedding_model=embedding_model,
-    )
-
-    drift_retriever = DriftRetriever(
-        retriever=retriever,
-    )
-
-    version_loader = VersionLoader(
-        session=session,
-    )
-
-    analyzer = DriftAnalyzer(
-        semantic_detector=SemanticDrift(
-            embedding_model=embedding_model,
-        ),
-    )
-
-    return DriftService(
-        version_loader=version_loader,
-        drift_retriever=drift_retriever,
-        analyzer=analyzer,
-    )
-
-
 @router.post(
     "/{document_id}/drift",
     response_model=DriftResponse,
@@ -107,19 +59,27 @@ def build_drift_service(
 def analyze_drift(
     document_id: str,
     request: DriftRequest,
-    session: Session = Depends(get_db),
+    service: DriftService = Depends(
+        get_drift_service
+    ),
 ):
 
     if request.from_version == request.to_version:
         raise HTTPException(
             status_code=400,
-            detail="from_version and to_version must be different.",
+            detail=(
+                "from_version and to_version "
+                "must be different."
+            ),
         )
 
     if request.from_version > request.to_version:
         raise HTTPException(
             status_code=400,
-            detail="from_version must be less than to_version.",
+            detail=(
+                "from_version must be less than "
+                "to_version."
+            ),
         )
 
     queries = [
@@ -131,14 +91,13 @@ def analyze_drift(
     if not queries:
         raise HTTPException(
             status_code=422,
-            detail="At least one non-empty query is required.",
+            detail=(
+                "At least one non-empty query "
+                "is required."
+            ),
         )
 
     try:
-        service = build_drift_service(
-            session
-        )
-
         reports = []
 
         for query in queries:
@@ -150,9 +109,7 @@ def analyze_drift(
                 top_k=request.top_k,
             )
 
-            reports.append(
-                report
-            )
+            reports.append(report)
 
         summary = create_summary(
             reports
@@ -169,9 +126,15 @@ def analyze_drift(
             reports=[
                 DriftReportResponse(
                     query=report.query,
-                    retrieval_overlap=report.retrieval_overlap,
-                    rank_change=report.rank_change,
-                    semantic_change=report.semantic_change,
+                    retrieval_overlap=(
+                        report.retrieval_overlap
+                    ),
+                    rank_change=(
+                        report.rank_change
+                    ),
+                    semantic_change=(
+                        report.semantic_change
+                    ),
                 )
                 for report in reports
             ],

@@ -17,9 +17,6 @@ class EmbeddingModel:
         self,
         texts: list[str],
     ):
-        if not texts:
-            return []
-
         return self.model.encode(
             texts,
             convert_to_numpy=True,

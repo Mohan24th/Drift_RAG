@@ -6,6 +6,11 @@ from sqlalchemy.orm import Session
 from app.database.connection import SessionLocal
 from app.database.document_service import DocumentService
 from app.database.repositories.documents import DocumentRepository
+from app.drift.analyzer import DriftAnalyzer
+from app.drift.retrieval import DriftRetriever
+from app.drift.semantic import SemanticDrift
+from app.drift.service import DriftService
+from app.drift.version_loader import VersionLoader
 from app.generation.llm import LLM
 from app.generation.qa import RAGAnswerer
 from app.generation.service import RAGService
@@ -67,4 +72,37 @@ def get_rag_service(
     return RAGService(
         document_service=document_service,
         answerer=answerer,
+    )
+
+
+def get_drift_service(
+    session: Session = Depends(get_db),
+    embedding_model: EmbeddingModel = Depends(
+        get_embedding_model
+    ),
+) -> DriftService:
+
+    retriever = PgRetriever(
+        session=session,
+        embedding_model=embedding_model,
+    )
+
+    drift_retriever = DriftRetriever(
+        retriever=retriever,
+    )
+
+    version_loader = VersionLoader(
+        session=session,
+    )
+
+    analyzer = DriftAnalyzer(
+        semantic_detector=SemanticDrift(
+            embedding_model=embedding_model,
+        ),
+    )
+
+    return DriftService(
+        version_loader=version_loader,
+        drift_retriever=drift_retriever,
+        analyzer=analyzer,
     )

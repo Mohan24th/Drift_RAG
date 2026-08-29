@@ -42,23 +42,6 @@ class DocumentRepository:
 
         return chunks
 
-    def get_document_by_name(
-        self,
-        name: str,
-    ) -> DocumentModel | None:
-
-        statement = (
-            select(DocumentModel)
-            .where(
-                DocumentModel.name == name
-            )
-            .limit(1)
-        )
-
-        return self.session.execute(
-            statement
-        ).scalar_one_or_none()
-
     def get_document_by_id(
         self,
         document_id: str,
@@ -68,6 +51,23 @@ class DocumentRepository:
             select(DocumentModel)
             .where(
                 DocumentModel.id == document_id
+            )
+            .limit(1)
+        )
+
+        return self.session.execute(
+            statement
+        ).scalar_one_or_none()
+
+    def get_document_by_name(
+        self,
+        name: str,
+    ) -> DocumentModel | None:
+
+        statement = (
+            select(DocumentModel)
+            .where(
+                DocumentModel.name == name
             )
             .limit(1)
         )
@@ -117,3 +117,17 @@ class DocumentRepository:
         return self.session.execute(
             statement
         ).scalar_one_or_none()
+
+    def get_next_version_number(
+        self,
+        document_id: str,
+    ) -> int:
+
+        latest = self.get_latest_version(
+            document_id
+        )
+
+        if latest is None:
+            return 1
+
+        return latest.version_number + 1

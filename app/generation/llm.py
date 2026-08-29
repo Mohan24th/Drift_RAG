@@ -33,11 +33,4 @@ class LLM:
             temperature=0,
         )
 
-        content = response.choices[0].message.content
-
-        if not content:
-            raise RuntimeError(
-                "LLM returned an empty response"
-            )
-
-        return content
+        return response.choices[0].message.content
