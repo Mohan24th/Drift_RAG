@@ -11,3 +11,6 @@ groq
 fastapi
 uvicorn
 python-multipart
+python-jose[cryptography]
+passlib
+bcrypt

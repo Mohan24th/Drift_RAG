@@ -6,6 +6,8 @@ from fastapi import (
 from pydantic import BaseModel, Field
 
 from app.api.dependencies import get_rag_service
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
 from app.generation.service import RAGService
 
 
@@ -47,6 +49,9 @@ def query_document(
     request: QueryRequest,
     service: RAGService = Depends(
         get_rag_service
+    ),
+    current_user: User = Depends(
+        get_current_user
     ),
 ):
 

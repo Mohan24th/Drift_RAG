@@ -35,12 +35,12 @@ def override_rag_service():
     return FakeRAGService()
 
 
-def test_query_document(client):
+def test_query_document(employee_client):
     app.dependency_overrides[
         get_rag_service
     ] = override_rag_service
 
-    response = client.post(
+    response = employee_client.post(
         f"/documents/{DOCUMENT_ID}/query",
         json={
             "question": "How many vacation days do employees get?",
@@ -58,11 +58,16 @@ def test_query_document(client):
 
     assert len(data["sources"]) == 1
 
+    assert data["sources"][0]["document_name"] == (
+        "Test Policy"
+    )
+
     assert data["sources"][0]["version_number"] == 3
+
     assert data["sources"][0]["chunk_index"] == 0
 
 
-def test_query_document_not_found(client):
+def test_query_document_not_found(employee_client):
     class NotFoundRAGService:
 
         def answer(
@@ -82,7 +87,7 @@ def test_query_document_not_found(client):
         get_rag_service
     ] = override_not_found_service
 
-    response = client.post(
+    response = employee_client.post(
         "/documents/nonexistent/query",
         json={
             "question": "How many vacation days?",
@@ -97,8 +102,12 @@ def test_query_document_not_found(client):
     )
 
 
-def test_query_empty_question(client):
-    response = client.post(
+def test_query_empty_question(employee_client):
+    app.dependency_overrides[
+        get_rag_service
+    ] = override_rag_service
+
+    response = employee_client.post(
         f"/documents/{DOCUMENT_ID}/query",
         json={
             "question": "",
@@ -109,8 +118,12 @@ def test_query_empty_question(client):
     assert response.status_code == 422
 
 
-def test_query_invalid_top_k(client):
-    response = client.post(
+def test_query_invalid_top_k(employee_client):
+    app.dependency_overrides[
+        get_rag_service
+    ] = override_rag_service
+
+    response = employee_client.post(
         f"/documents/{DOCUMENT_ID}/query",
         json={
             "question": "How many vacation days?",
@@ -121,8 +134,12 @@ def test_query_invalid_top_k(client):
     assert response.status_code == 422
 
 
-def test_query_top_k_too_large(client):
-    response = client.post(
+def test_query_top_k_too_large(employee_client):
+    app.dependency_overrides[
+        get_rag_service
+    ] = override_rag_service
+
+    response = employee_client.post(
         f"/documents/{DOCUMENT_ID}/query",
         json={
             "question": "How many vacation days?",

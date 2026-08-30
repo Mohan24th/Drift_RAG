@@ -1,13 +1,19 @@
 from app.api.dependencies import get_drift_service
 from app.api.main import app
-from app.drift.report import DriftReport
 
 
 DOCUMENT_ID = "647e4ef2-d359-4a93-8a27-f4bece148ee1"
 
 
-class FakeDriftService:
+class FakeDriftReport:
+    def __init__(self, query):
+        self.query = query
+        self.retrieval_overlap = 1.0
+        self.rank_change = 0.2
+        self.semantic_change = 0.07
 
+
+class FakeDriftService:
     def analyze(
         self,
         document_id: str,
@@ -16,24 +22,19 @@ class FakeDriftService:
         query: str,
         top_k: int = 3,
     ):
-        return DriftReport(
-            query=query,
-            retrieval_overlap=1.0,
-            rank_change=0.2,
-            semantic_change=0.07,
-        )
+        return FakeDriftReport(query)
 
 
 def override_drift_service():
     return FakeDriftService()
 
 
-def test_drift_document(client):
+def test_drift_document(admin_client):
     app.dependency_overrides[
         get_drift_service
     ] = override_drift_service
 
-    response = client.post(
+    response = admin_client.post(
         f"/documents/{DOCUMENT_ID}/drift",
         json={
             "from_version": 1,
@@ -55,7 +56,6 @@ def test_drift_document(client):
     assert data["to_version"] == 3
 
     assert data["queries_evaluated"] == 2
-
     assert len(data["reports"]) == 2
 
     assert data["reports"][0]["query"] == (
@@ -63,8 +63,26 @@ def test_drift_document(client):
     )
 
 
-def test_drift_same_version(client):
-    response = client.post(
+def test_drift_forbidden_for_employee(
+    employee_client,
+):
+    response = employee_client.post(
+        f"/documents/{DOCUMENT_ID}/drift",
+        json={
+            "from_version": 1,
+            "to_version": 3,
+            "queries": [
+                "How many vacation days?"
+            ],
+            "top_k": 3,
+        },
+    )
+
+    assert response.status_code == 403
+
+
+def test_drift_same_version(admin_client):
+    response = admin_client.post(
         f"/documents/{DOCUMENT_ID}/drift",
         json={
             "from_version": 3,
@@ -84,8 +102,8 @@ def test_drift_same_version(client):
     )
 
 
-def test_drift_reverse_versions(client):
-    response = client.post(
+def test_drift_reverse_versions(admin_client):
+    response = admin_client.post(
         f"/documents/{DOCUMENT_ID}/drift",
         json={
             "from_version": 3,
@@ -105,8 +123,8 @@ def test_drift_reverse_versions(client):
     )
 
 
-def test_drift_empty_queries(client):
-    response = client.post(
+def test_drift_empty_queries(admin_client):
+    response = admin_client.post(
         f"/documents/{DOCUMENT_ID}/drift",
         json={
             "from_version": 1,
@@ -119,8 +137,8 @@ def test_drift_empty_queries(client):
     assert response.status_code == 422
 
 
-def test_drift_invalid_top_k(client):
-    response = client.post(
+def test_drift_invalid_top_k(admin_client):
+    response = admin_client.post(
         f"/documents/{DOCUMENT_ID}/drift",
         json={
             "from_version": 1,
@@ -135,7 +153,7 @@ def test_drift_invalid_top_k(client):
     assert response.status_code == 422
 
 
-def test_drift_not_found(client):
+def test_drift_not_found(admin_client):
     class NotFoundDriftService:
 
         def analyze(
@@ -157,7 +175,7 @@ def test_drift_not_found(client):
         get_drift_service
     ] = override_not_found_service
 
-    response = client.post(
+    response = admin_client.post(
         f"/documents/{DOCUMENT_ID}/drift",
         json={
             "from_version": 1,

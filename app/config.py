@@ -42,6 +42,15 @@ class Settings:
             if origin.strip()
         ]
 
+        self.jwt_secret_key = os.getenv(
+            "JWT_SECRET_KEY"
+        )
+
+        if not self.jwt_secret_key:
+            raise RuntimeError(
+                "JWT_SECRET_KEY is not set"
+            )
+
         if not self.database_url:
             raise RuntimeError(
                 "DATABASE_URL is not set"

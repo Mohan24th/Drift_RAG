@@ -18,6 +18,8 @@ from app.api.dependencies import (
     get_db,
     get_document_service,
 )
+from app.auth.dependencies import require_roles
+from app.auth.models import User
 from app.database.document_service import DocumentService
 from app.database.models import DocumentModel
 from app.database.repositories.documents import (
@@ -108,6 +110,9 @@ async def upload_document_version(
     session: Session = Depends(get_db),
     document_service: DocumentService = Depends(
         get_document_service
+    ),
+    current_user: User = Depends(
+        require_roles("HR", "ADMIN")
     ),
 ):
     repository = DocumentRepository(
@@ -238,6 +243,9 @@ def approve_document_version(
     document_id: str,
     version_number: int,
     session: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles("HR", "ADMIN")
+    ),
 ):
     repository = DocumentRepository(
         session=session

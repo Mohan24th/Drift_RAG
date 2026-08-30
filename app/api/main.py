@@ -5,7 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+
+
 from app.api.routes import (
+    auth,
     documents,
     drift,
     query,
@@ -95,6 +98,12 @@ app.include_router(
     drift.router,
     prefix="/documents",
     tags=["Drift"],
+)
+
+app.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["Authentication"],
 )
 
 

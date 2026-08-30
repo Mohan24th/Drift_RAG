@@ -4,7 +4,8 @@ from fastapi import (
     HTTPException,
 )
 from pydantic import BaseModel, Field
-
+from app.auth.dependencies import require_roles
+from app.auth.models import User
 from app.api.dependencies import get_drift_service
 from app.drift.service import DriftService
 from app.drift.summary import create_summary
@@ -61,6 +62,9 @@ def analyze_drift(
     request: DriftRequest,
     service: DriftService = Depends(
         get_drift_service
+    ),
+    current_user: User = Depends(
+        require_roles("HR", "ADMIN")
     ),
 ):
 
