@@ -68,6 +68,17 @@ class DocumentVersionModel(Base):
         nullable=False,
     )
 
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="DRAFT",
+    )
+
+    approved_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
@@ -115,7 +126,6 @@ class ChunkModel(Base):
     version: Mapped["DocumentVersionModel"] = relationship(
         back_populates="chunks",
     )
-
 
     @property
     def chunk_id(self) -> str:

@@ -1,4 +1,7 @@
+from datetime import datetime
 from pathlib import Path
+from tempfile import NamedTemporaryFile
+from uuid import uuid4
 
 from fastapi import (
     APIRouter,
@@ -15,9 +18,11 @@ from app.api.dependencies import (
     get_db,
     get_document_service,
 )
-from app.database.models import DocumentModel
-from app.database.repositories.documents import DocumentRepository
 from app.database.document_service import DocumentService
+from app.database.models import DocumentModel
+from app.database.repositories.documents import (
+    DocumentRepository,
+)
 
 
 router = APIRouter()
@@ -75,14 +80,14 @@ def create_document(
             detail="A document with this name already exists.",
         )
 
-    from uuid import uuid4
-
     document = DocumentModel(
         id=str(uuid4()),
         name=name,
     )
 
-    repository.create_document(document)
+    repository.create_document(
+        document
+    )
 
     session.commit()
 
@@ -119,6 +124,22 @@ async def upload_document_version(
             detail="Document not found.",
         )
 
+    expected_version = (
+        repository.get_next_version_number(
+            document_id
+        )
+    )
+
+    if version_number != expected_version:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"Invalid version number. "
+                f"The next version must be "
+                f"v{expected_version}."
+            ),
+        )
+
     if not file.filename:
         raise HTTPException(
             status_code=400,
@@ -129,7 +150,10 @@ async def upload_document_version(
         file.filename
     ).suffix.lower()
 
-    if suffix not in {".pdf", ".txt"}:
+    if suffix not in {
+        ".pdf",
+        ".txt",
+    }:
         raise HTTPException(
             status_code=400,
             detail="Only PDF and TXT files are supported.",
@@ -139,8 +163,6 @@ async def upload_document_version(
     total_size = 0
 
     try:
-        from tempfile import NamedTemporaryFile
-
         with NamedTemporaryFile(
             delete=False,
             suffix=suffix,
@@ -185,7 +207,9 @@ async def upload_document_version(
             document_id=document.id,
             version_id=result["version"].id,
             version_number=result["version"].version_number,
-            chunks_created=len(result["chunks"]),
+            chunks_created=len(
+                result["chunks"]
+            ),
         )
 
     except HTTPException:
@@ -204,3 +228,65 @@ async def upload_document_version(
             )
 
         await file.close()
+
+
+@router.post(
+    "/{document_id}/versions/{version_number}/approve",
+    response_model=VersionResponse,
+)
+def approve_document_version(
+    document_id: str,
+    version_number: int,
+    session: Session = Depends(get_db),
+):
+    repository = DocumentRepository(
+        session=session
+    )
+
+    document = repository.get_document_by_id(
+        document_id
+    )
+
+    if document is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found.",
+        )
+
+    version = repository.get_version(
+        document_id=document_id,
+        version_number=version_number,
+    )
+
+    if version is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"Version v{version_number} "
+                "not found."
+            ),
+        )
+
+    if version.status == "APPROVED":
+        return VersionResponse(
+            document_id=document_id,
+            version_id=version.id,
+            version_number=version.version_number,
+            chunks_created=len(
+                version.chunks
+            ),
+        )
+
+    version.status = "APPROVED"
+    version.approved_at = datetime.utcnow()
+
+    session.commit()
+
+    return VersionResponse(
+        document_id=document_id,
+        version_id=version.id,
+        version_number=version.version_number,
+        chunks_created=len(
+            version.chunks
+        ),
+    )

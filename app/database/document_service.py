@@ -94,12 +94,13 @@ class DocumentService:
                     f"v{latest_version.version_number}."
                 )
 
-            # 3. Create new version
+            # 3. Create new version as DRAFT
             version = DocumentVersionModel(
                 id=str(uuid4()),
                 document_id=document.id,
                 version_number=version_number,
                 file_path=str(path),
+                status="DRAFT",
             )
 
             self.repository.create_version(
@@ -187,6 +188,24 @@ class DocumentService:
         if version is None:
             raise ValueError(
                 f"No versions found for document: {document_id}"
+            )
+
+        return version
+
+    def get_latest_approved_version(
+        self,
+        document_id: str,
+    ) -> DocumentVersionModel:
+
+        version = (
+            self.repository.get_latest_approved_version(
+                document_id
+            )
+        )
+
+        if version is None:
+            raise ValueError(
+                f"No approved versions found for document: {document_id}"
             )
 
         return version

@@ -131,3 +131,26 @@ class DocumentRepository:
             return 1
 
         return latest.version_number + 1
+
+    def get_latest_approved_version(
+        self,
+        document_id: str,
+    ) -> DocumentVersionModel | None:
+
+        statement = (
+            select(DocumentVersionModel)
+            .where(
+                DocumentVersionModel.document_id
+                == document_id,
+                DocumentVersionModel.status
+                == "APPROVED",
+            )
+            .order_by(
+                DocumentVersionModel.version_number.desc()
+            )
+            .limit(1)
+        )
+
+        return self.session.execute(
+            statement
+        ).scalar_one_or_none()
