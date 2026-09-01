@@ -43,6 +43,19 @@ class Settings:
             "data/documents",
         )
 
+        self.supabase_url = os.getenv(
+            "SUPABASE_URL"
+        )
+
+        self.supabase_service_key = os.getenv(
+            "SUPABASE_SERVICE_KEY"
+        )
+
+        self.supabase_storage_bucket = os.getenv(
+            "SUPABASE_STORAGE_BUCKET",
+            "drift-rag-documents",
+        )
+
         self.cors_origins = [
             origin.strip()
             for origin in os.getenv(
@@ -70,6 +83,19 @@ class Settings:
             raise RuntimeError(
                 "GROQ_API_KEY is not set"
             )
+
+        if self.document_storage == "supabase":
+            if not self.supabase_url:
+                raise RuntimeError(
+                    "SUPABASE_URL is required "
+                    "when DOCUMENT_STORAGE=supabase"
+                )
+
+            if not self.supabase_service_key:
+                raise RuntimeError(
+                    "SUPABASE_SERVICE_KEY is required "
+                    "when DOCUMENT_STORAGE=supabase"
+                )
 
 
 settings = Settings()

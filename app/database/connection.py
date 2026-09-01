@@ -4,10 +4,30 @@ from sqlalchemy.orm import sessionmaker
 from app.config import settings
 
 
+DATABASE_URL = settings.database_url
+
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL is not set"
+    )
+
+
+# SQLAlchemy must use the Psycopg 3 driver.
+if DATABASE_URL.startswith(
+    "postgresql://"
+):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql://",
+        "postgresql+psycopg://",
+        1,
+    )
+
+
 engine = create_engine(
-    settings.database_url,
+    DATABASE_URL,
     pool_pre_ping=True,
 )
+
 
 SessionLocal = sessionmaker(
     bind=engine,

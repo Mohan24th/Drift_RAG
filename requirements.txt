@@ -6,10 +6,10 @@ sqlalchemy
 psycopg[binary]
 pgvector
 python-dotenv
-psycopg2
 groq
 fastapi
 uvicorn
 python-multipart
 python-jose[cryptography]
 bcrypt
+supabase

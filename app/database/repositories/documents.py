@@ -42,6 +42,23 @@ class DocumentRepository:
 
         return chunks
 
+    def get_documents(
+        self,
+    ) -> list[DocumentModel]:
+
+        statement = (
+            select(DocumentModel)
+            .order_by(
+                DocumentModel.created_at.desc()
+            )
+        )
+
+        return list(
+            self.session.execute(
+                statement
+            ).scalars().all()
+        )
+
     def get_document_by_id(
         self,
         document_id: str,
@@ -75,6 +92,28 @@ class DocumentRepository:
         return self.session.execute(
             statement
         ).scalar_one_or_none()
+
+    def get_versions(
+        self,
+        document_id: str,
+    ) -> list[DocumentVersionModel]:
+
+        statement = (
+            select(DocumentVersionModel)
+            .where(
+                DocumentVersionModel.document_id
+                == document_id
+            )
+            .order_by(
+                DocumentVersionModel.version_number.desc()
+            )
+        )
+
+        return list(
+            self.session.execute(
+                statement
+            ).scalars().all()
+        )
 
     def get_latest_version(
         self,

@@ -56,6 +56,28 @@ class VersionResponse(BaseModel):
     chunks_created: int
 
 
+class VersionListItem(BaseModel):
+    id: str
+    version_number: int
+    status: str
+    file_path: str
+    created_at: datetime
+    approved_at: datetime | None
+
+
+class DocumentDetailResponse(BaseModel):
+    id: str
+    name: str
+    created_at: datetime
+    versions_count: int
+
+
+class DocumentListItem(BaseModel):
+    id: str
+    name: str
+    created_at: datetime
+
+
 @router.post(
     "/",
     response_model=DocumentResponse,
@@ -83,7 +105,10 @@ def create_document(
     if existing is not None:
         raise HTTPException(
             status_code=409,
-            detail="A document with this name already exists.",
+            detail=(
+                "A document with this name "
+                "already exists."
+            ),
         )
 
     document = DocumentModel(
@@ -101,6 +126,111 @@ def create_document(
         id=document.id,
         name=document.name,
     )
+
+
+@router.get(
+    "/",
+    response_model=list[DocumentListItem],
+)
+def list_documents(
+    session: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles("HR", "ADMIN")
+    ),
+):
+    repository = DocumentRepository(
+        session=session,
+    )
+
+    documents = repository.get_documents()
+
+    return [
+        DocumentListItem(
+            id=document.id,
+            name=document.name,
+            created_at=document.created_at,
+        )
+        for document in documents
+    ]
+
+
+@router.get(
+    "/{document_id}",
+    response_model=DocumentDetailResponse,
+)
+def get_document(
+    document_id: str,
+    session: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles("HR", "ADMIN")
+    ),
+):
+    repository = DocumentRepository(
+        session=session,
+    )
+
+    document = repository.get_document_by_id(
+        document_id
+    )
+
+    if document is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found.",
+        )
+
+    versions = repository.get_versions(
+        document_id
+    )
+
+    return DocumentDetailResponse(
+        id=document.id,
+        name=document.name,
+        created_at=document.created_at,
+        versions_count=len(versions),
+    )
+
+
+@router.get(
+    "/{document_id}/versions",
+    response_model=list[VersionListItem],
+)
+def list_document_versions(
+    document_id: str,
+    session: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles("HR", "ADMIN")
+    ),
+):
+    repository = DocumentRepository(
+        session=session,
+    )
+
+    document = repository.get_document_by_id(
+        document_id
+    )
+
+    if document is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found.",
+        )
+
+    versions = repository.get_versions(
+        document_id
+    )
+
+    return [
+        VersionListItem(
+            id=version.id,
+            version_number=version.version_number,
+            status=version.status,
+            file_path=version.file_path,
+            created_at=version.created_at,
+            approved_at=version.approved_at,
+        )
+        for version in versions
+    ]
 
 
 @router.post(
@@ -158,8 +288,12 @@ async def upload_document_version(
             detail="A file is required.",
         )
 
-    suffix = Path(
+    original_filename = Path(
         file.filename
+    ).name
+
+    suffix = Path(
+        original_filename
     ).suffix.lower()
 
     if suffix not in {
@@ -171,7 +305,9 @@ async def upload_document_version(
             detail="Only PDF and TXT files are supported.",
         )
 
-    temp_path = None
+    upload_temp_path = None
+    ingestion_temp_path = None
+
     total_size = 0
 
     try:
@@ -179,6 +315,8 @@ async def upload_document_version(
             delete=False,
             suffix=suffix,
         ) as temp_file:
+
+            upload_temp_path = temp_file.name
 
             while True:
                 chunk = await file.read(
@@ -201,26 +339,27 @@ async def upload_document_version(
 
                 temp_file.write(chunk)
 
-            temp_path = temp_file.name
-
         if total_size == 0:
             raise HTTPException(
                 status_code=400,
                 detail="Uploaded file is empty.",
             )
 
-        stored_path = document_storage.save(
-            source_path=temp_path,
+        storage_path = document_storage.save(
+            source_path=upload_temp_path,
             document_id=document.id,
             version_number=version_number,
-            filename=file.filename,
+            filename=original_filename,
         )
 
-        # The storage layer moved the temporary file.
-        temp_path = None
+        ingestion_temp_path = (
+            document_storage.get_local_path(
+                storage_path
+            )
+        )
 
         result = document_service.ingest_document(
-            file_path=stored_path,
+            file_path=ingestion_temp_path,
             document_name=document.name,
             version_number=version_number,
         )
@@ -244,9 +383,16 @@ async def upload_document_version(
         ) from exc
 
     finally:
-        if temp_path:
+        if upload_temp_path:
             Path(
-                temp_path
+                upload_temp_path
+            ).unlink(
+                missing_ok=True
+            )
+
+        if ingestion_temp_path:
+            Path(
+                ingestion_temp_path
             ).unlink(
                 missing_ok=True
             )

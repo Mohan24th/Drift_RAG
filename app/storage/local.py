@@ -10,9 +10,7 @@ class LocalDocumentStorage(
         self,
         base_dir: str,
     ):
-        self.base_dir = Path(
-            base_dir
-        )
+        self.base_dir = Path(base_dir)
 
     def save(
         self,
@@ -49,8 +47,20 @@ class LocalDocumentStorage(
             / safe_filename
         )
 
-        source.replace(
-            destination
-        )
+        source.replace(destination)
 
         return str(destination)
+
+    def get_local_path(
+        self,
+        storage_path: str,
+    ) -> str:
+
+        path = Path(storage_path)
+
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"Stored document not found: {path}"
+            )
+
+        return str(path)
