@@ -25,6 +25,10 @@ from app.database.models import DocumentModel
 from app.database.repositories.documents import (
     DocumentRepository,
 )
+from app.storage.base import DocumentStorage
+from app.storage.dependencies import (
+    get_document_storage,
+)
 
 
 router = APIRouter()
@@ -114,6 +118,9 @@ async def upload_document_version(
     current_user: User = Depends(
         require_roles("HR", "ADMIN")
     ),
+    document_storage: DocumentStorage = Depends(
+        get_document_storage
+    ),
 ):
     repository = DocumentRepository(
         session=session,
@@ -202,8 +209,18 @@ async def upload_document_version(
                 detail="Uploaded file is empty.",
             )
 
+        stored_path = document_storage.save(
+            source_path=temp_path,
+            document_id=document.id,
+            version_number=version_number,
+            filename=file.filename,
+        )
+
+        # The storage layer moved the temporary file.
+        temp_path = None
+
         result = document_service.ingest_document(
-            file_path=temp_path,
+            file_path=stored_path,
             document_name=document.name,
             version_number=version_number,
         )
@@ -228,7 +245,9 @@ async def upload_document_version(
 
     finally:
         if temp_path:
-            Path(temp_path).unlink(
+            Path(
+                temp_path
+            ).unlink(
                 missing_ok=True
             )
 

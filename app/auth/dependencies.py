@@ -1,7 +1,17 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import (
+    Depends,
+    HTTPException,
+    status,
+)
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+)
+from sqlalchemy.orm import Session
 
+from app.api.dependencies import get_db
 from app.auth.models import User
+from app.auth.repository import UserRepository
 from app.auth.security import decode_access_token
 
 
@@ -12,6 +22,7 @@ def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(
         security
     ),
+    session: Session = Depends(get_db),
 ) -> User:
 
     token = credentials.credentials
@@ -20,6 +31,7 @@ def get_current_user(
         payload = decode_access_token(
             token
         )
+
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -27,19 +39,37 @@ def get_current_user(
         ) from exc
 
     user_id = payload.get("sub")
-    username = payload.get("username")
-    role = payload.get("role")
 
-    if not user_id or not username or not role:
+    if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication token.",
         )
 
+    repository = UserRepository(
+        session=session
+    )
+
+    user = repository.get_by_id(
+        user_id
+    )
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User no longer exists.",
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account is inactive.",
+        )
+
     return User(
-        id=user_id,
-        username=username,
-        role=role,
+        id=user.id,
+        username=user.username,
+        role=user.role,
     )
 
 
@@ -56,7 +86,10 @@ def require_roles(
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You do not have permission to perform this action.",
+                detail=(
+                    "You do not have permission "
+                    "to perform this action."
+                ),
             )
 
         return current_user

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.config import settings
 
@@ -10,19 +10,25 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-)
-
-
 def hash_password(
     password: str,
 ) -> str:
 
-    return pwd_context.hash(
-        password
+    password_bytes = password.encode(
+        "utf-8"
     )
+
+    if len(password_bytes) > 72:
+        raise ValueError(
+            "Password must be 72 bytes or fewer."
+        )
+
+    hashed = bcrypt.hashpw(
+        password_bytes,
+        bcrypt.gensalt(),
+    )
+
+    return hashed.decode("utf-8")
 
 
 def verify_password(
@@ -30,10 +36,21 @@ def verify_password(
     password_hash: str,
 ) -> bool:
 
-    return pwd_context.verify(
-        password,
-        password_hash,
+    password_bytes = password.encode(
+        "utf-8"
     )
+
+    if len(password_bytes) > 72:
+        return False
+
+    try:
+        return bcrypt.checkpw(
+            password_bytes,
+            password_hash.encode("utf-8"),
+        )
+
+    except ValueError:
+        return False
 
 
 def create_access_token(

@@ -33,6 +33,16 @@ class Settings:
             )
         )
 
+        self.document_storage = os.getenv(
+            "DOCUMENT_STORAGE",
+            "local",
+        )
+
+        self.document_storage_path = os.getenv(
+            "DOCUMENT_STORAGE_PATH",
+            "data/documents",
+        )
+
         self.cors_origins = [
             origin.strip()
             for origin in os.getenv(

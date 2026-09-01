@@ -1,7 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+)
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
-from app.auth.security import create_access_token
+from app.api.dependencies import get_db
+from app.auth.repository import UserRepository
+from app.auth.service import AuthService
 
 
 router = APIRouter()
@@ -24,23 +31,15 @@ class TokenResponse(BaseModel):
     token_type: str
 
 
-DEMO_USERS = {
-    "employee": {
-        "id": "employee-1",
-        "password": "employee123",
-        "role": "EMPLOYEE",
-    },
-    "hr": {
-        "id": "hr-1",
-        "password": "hr123",
-        "role": "HR",
-    },
-    "admin": {
-        "id": "admin-1",
-        "password": "admin123",
-        "role": "ADMIN",
-    },
-}
+def get_auth_service(
+    session: Session = Depends(get_db),
+) -> AuthService:
+
+    return AuthService(
+        repository=UserRepository(
+            session=session
+        )
+    )
 
 
 @router.post(
@@ -49,26 +48,30 @@ DEMO_USERS = {
 )
 def login(
     request: LoginRequest,
+    service: AuthService = Depends(
+        get_auth_service
+    ),
 ):
 
-    user = DEMO_USERS.get(
-        request.username
-    )
+    username = request.username.strip()
 
-    if (
-        user is None
-        or user["password"] != request.password
-    ):
+    if not username:
         raise HTTPException(
-            status_code=401,
-            detail="Invalid username or password.",
+            status_code=422,
+            detail="Username cannot be empty.",
         )
 
-    token = create_access_token(
-        user_id=user["id"],
-        username=request.username,
-        role=user["role"],
-    )
+    try:
+        token = service.authenticate(
+            username=username,
+            password=request.password,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=401,
+            detail=str(exc),
+        ) from exc
 
     return TokenResponse(
         access_token=token,
