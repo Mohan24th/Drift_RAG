@@ -1,7 +1,10 @@
-from app.drift.report import DriftReport
 from app.drift.metrics import (
-    top_k_overlap,
     mean_rank_change,
+    top_k_overlap,
+)
+from app.drift.report import (
+    DriftChange,
+    DriftReport,
 )
 from app.drift.semantic import SemanticDrift
 
@@ -20,11 +23,16 @@ class DriftAnalyzer:
         v2_results,
     ) -> DriftReport:
 
-        # Use chunk_index as the logical identity
-        # across document versions.
+        # -------------------------------------------------
+        # Retrieval identity
+        # -------------------------------------------------
+        # chunk_index is the logical identity across
+        # document versions.
         #
-        # Database UUIDs are unique per row, so the
-        # UUID of V1 chunk 0 will differ from V2 chunk 0.
+        # Database UUIDs are different for each version,
+        # so UUIDs cannot be used for cross-version
+        # comparison.
+
         v1_ids = [
             chunk.chunk_index
             for chunk, _ in v1_results
@@ -35,9 +43,9 @@ class DriftAnalyzer:
             for chunk, _ in v2_results
         ]
 
-        # -----------------------------
+        # -------------------------------------------------
         # Retrieval drift
-        # -----------------------------
+        # -------------------------------------------------
 
         retrieval_overlap = top_k_overlap(
             v1_ids,
@@ -49,12 +57,10 @@ class DriftAnalyzer:
             v2_ids,
         )
 
-        # -----------------------------
+        # -------------------------------------------------
         # Content drift
-        # -----------------------------
+        # -------------------------------------------------
 
-        # Match V1 and V2 chunks using their
-        # logical position within the document.
         v2_by_index = {
             chunk.chunk_index: chunk
             for chunk, _ in v2_results
@@ -62,6 +68,8 @@ class DriftAnalyzer:
 
         weighted_changes = []
         total_weight = 0.0
+
+        changes = []
 
         for rank, (v1_chunk, _) in enumerate(
             v1_results,
@@ -72,6 +80,15 @@ class DriftAnalyzer:
             )
 
             if v2_chunk is None:
+                changes.append(
+                    DriftChange(
+                        chunk_index=v1_chunk.chunk_index,
+                        v1_text=v1_chunk.text,
+                        v2_text="",
+                        change_type="REMOVED",
+                    )
+                )
+
                 continue
 
             change = self.semantic_detector.calculate(
@@ -79,7 +96,6 @@ class DriftAnalyzer:
                 v2_chunk.text,
             )
 
-            # Higher-ranked results have more influence.
             weight = 1.0 / rank
 
             weighted_changes.append(
@@ -88,19 +104,55 @@ class DriftAnalyzer:
 
             total_weight += weight
 
+            if change > 0:
+                changes.append(
+                    DriftChange(
+                        chunk_index=v1_chunk.chunk_index,
+                        v1_text=v1_chunk.text,
+                        v2_text=v2_chunk.text,
+                        change_type="CONTENT",
+                    )
+                )
+
+        # -------------------------------------------------
+        # Detect newly retrieved chunks
+        # -------------------------------------------------
+
+        v1_index_set = set(
+            v1_ids
+        )
+
+        for v2_chunk, _ in v2_results:
+
+            if (
+                v2_chunk.chunk_index
+                not in v1_index_set
+            ):
+                changes.append(
+                    DriftChange(
+                        chunk_index=v2_chunk.chunk_index,
+                        v1_text="",
+                        v2_text=v2_chunk.text,
+                        change_type="ADDED",
+                    )
+                )
+
+        # -------------------------------------------------
+        # Semantic change
+        # -------------------------------------------------
+
         if total_weight > 0:
             semantic_change = (
                 sum(weighted_changes)
                 / total_weight
             )
+
         else:
-            # No matching chunks means maximum
-            # content uncertainty/change.
             semantic_change = 1.0
 
-        # -----------------------------
+        # -------------------------------------------------
         # Final report
-        # -----------------------------
+        # -------------------------------------------------
 
         return DriftReport(
             query=query,
@@ -110,4 +162,5 @@ class DriftAnalyzer:
                 0.0,
                 semantic_change,
             ),
+            changes=changes,
         )

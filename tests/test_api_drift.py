@@ -11,6 +11,7 @@ class FakeDriftReport:
         self.retrieval_overlap = 1.0
         self.rank_change = 0.2
         self.semantic_change = 0.07
+        self.changes = []
 
 
 class FakeDriftService:

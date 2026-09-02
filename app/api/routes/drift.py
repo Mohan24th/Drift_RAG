@@ -4,9 +4,10 @@ from fastapi import (
     HTTPException,
 )
 from pydantic import BaseModel, Field
+
+from app.api.dependencies import get_drift_service
 from app.auth.dependencies import require_roles
 from app.auth.models import User
-from app.api.dependencies import get_drift_service
 from app.drift.service import DriftService
 from app.drift.summary import create_summary
 
@@ -35,11 +36,19 @@ class DriftRequest(BaseModel):
     )
 
 
+class DriftChangeResponse(BaseModel):
+    chunk_index: int
+    v1_text: str
+    v2_text: str
+    change_type: str
+
+
 class DriftReportResponse(BaseModel):
     query: str
     retrieval_overlap: float
     rank_change: float
     semantic_change: float
+    changes: list[DriftChangeResponse]
 
 
 class DriftResponse(BaseModel):
@@ -68,7 +77,10 @@ def analyze_drift(
     ),
 ):
 
-    if request.from_version == request.to_version:
+    if (
+        request.from_version
+        == request.to_version
+    ):
         raise HTTPException(
             status_code=400,
             detail=(
@@ -77,7 +89,10 @@ def analyze_drift(
             ),
         )
 
-    if request.from_version > request.to_version:
+    if (
+        request.from_version
+        > request.to_version
+    ):
         raise HTTPException(
             status_code=400,
             detail=(
@@ -139,6 +154,15 @@ def analyze_drift(
                     semantic_change=(
                         report.semantic_change
                     ),
+                    changes=[
+                        DriftChangeResponse(
+                            chunk_index=change.chunk_index,
+                            v1_text=change.v1_text,
+                            v2_text=change.v2_text,
+                            change_type=change.change_type,
+                        )
+                        for change in report.changes
+                    ],
                 )
                 for report in reports
             ],

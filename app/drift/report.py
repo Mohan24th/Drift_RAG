@@ -2,12 +2,22 @@ from dataclasses import dataclass
 
 
 @dataclass
+class DriftChange:
+    chunk_index: int
+    v1_text: str
+    v2_text: str
+    change_type: str
+
+
+@dataclass
 class DriftReport:
     query: str
 
     retrieval_overlap: float
     rank_change: float
     semantic_change: float
+
+    changes: list[DriftChange]
 
     @property
     def retrieval_drift(self) -> float:
@@ -19,7 +29,9 @@ class DriftReport:
         - ranking change
         """
 
-        overlap_drift = 1.0 - self.retrieval_overlap
+        overlap_drift = (
+            1.0 - self.retrieval_overlap
+        )
 
         return (
             overlap_drift
