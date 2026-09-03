@@ -1,15 +1,15 @@
 import {
+  useEffect,
   useState,
 } from "react";
 
 import {
+  getAvailableDocuments,
   queryDocument,
 } from "../api/client";
 
 import { useAuth } from "../auth/AuthContext";
 
-const DOCUMENT_ID =
-  "647e4ef2-d359-4a93-8a27-f4bece148ee1";
 
 export default function EmployeeApp() {
   const {
@@ -17,6 +17,16 @@ export default function EmployeeApp() {
     user,
     logout,
   } = useAuth();
+
+  const [
+    documents,
+    setDocuments,
+  ] = useState([]);
+
+  const [
+    selectedDocumentId,
+    setSelectedDocumentId,
+  ] = useState("");
 
   const [
     question,
@@ -29,14 +39,56 @@ export default function EmployeeApp() {
   ] = useState(null);
 
   const [
+    loadingDocuments,
+    setLoadingDocuments,
+  ] = useState(true);
+
+  const [
+    loadingAnswer,
+    setLoadingAnswer,
+  ] = useState(false);
+
+  const [
     error,
     setError,
   ] = useState("");
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(false);
+
+  useEffect(() => {
+    async function loadDocuments() {
+      setLoadingDocuments(true);
+      setError("");
+
+      try {
+        const data =
+          await getAvailableDocuments(
+            token
+          );
+
+        setDocuments(data);
+
+        if (
+          data.length > 0
+        ) {
+          setSelectedDocumentId(
+            data[0].id
+          );
+        }
+      } catch (err) {
+        setError(
+          err.message ||
+            "Unable to load company policies."
+        );
+      } finally {
+        setLoadingDocuments(
+          false
+        );
+      }
+    }
+
+    loadDocuments();
+  }, [token]);
+
 
   async function handleAsk(
     event
@@ -47,17 +99,29 @@ export default function EmployeeApp() {
       question.trim();
 
     if (!trimmed) {
+      setError(
+        "Please enter a question."
+      );
       return;
     }
 
-    setLoading(true);
+    if (
+      !selectedDocumentId
+    ) {
+      setError(
+        "Please select a policy."
+      );
+      return;
+    }
+
+    setLoadingAnswer(true);
     setError("");
     setResult(null);
 
     try {
       const data =
         await queryDocument(
-          DOCUMENT_ID,
+          selectedDocumentId,
           trimmed,
           3,
           token
@@ -70,125 +134,332 @@ export default function EmployeeApp() {
           "Unable to get an answer."
       );
     } finally {
-      setLoading(false);
+      setLoadingAnswer(
+        false
+      );
     }
   }
 
-  return (
-    <main>
-      <header>
-        <div>
-          <h1>
-            Drift RAG
-          </h1>
 
-          <p>
-            Welcome,{" "}
-            {user.username}
-          </p>
+  function handleDocumentChange(
+    event
+  ) {
+    setSelectedDocumentId(
+      event.target.value
+    );
+
+    setResult(null);
+    setError("");
+  }
+
+
+  return (
+    <div className="employee-page">
+
+      {/* --------------------------------------------- */}
+      {/* Top navigation */}
+      {/* --------------------------------------------- */}
+
+      <header className="app-header">
+
+        <div className="brand">
+          <div className="brand-mark">
+            DR
+          </div>
+
+          <div>
+            <h1>
+              Drift RAG
+            </h1>
+
+            <span>
+              Company Knowledge Assistant
+            </span>
+          </div>
         </div>
 
-        <button
-          onClick={logout}
-        >
-          Sign out
-        </button>
-      </header>
 
-      <section>
-        <h2>
-          Ask Company AI
-        </h2>
+        <div className="user-area">
+          <div className="user-info">
+            <strong>
+              {user.username}
+            </strong>
 
-        <form
-          onSubmit={
-            handleAsk
-          }
-        >
-          <textarea
-            value={
-              question
-            }
-            onChange={(
-              event
-            ) =>
-              setQuestion(
-                event.target
-                  .value
-              )
-            }
-            placeholder="Ask a question about company policy..."
-            rows={5}
-          />
+            <span>
+              Employee
+            </span>
+          </div>
 
           <button
-            type="submit"
-            disabled={
-              loading ||
-              !question.trim()
+            type="button"
+            className="secondary-button"
+            onClick={logout}
+          >
+            Sign out
+          </button>
+        </div>
+
+      </header>
+
+
+      {/* --------------------------------------------- */}
+      {/* Main content */}
+      {/* --------------------------------------------- */}
+
+      <main className="employee-content">
+
+        <section className="hero-section">
+
+          <div className="hero-badge">
+            COMPANY AI
+          </div>
+
+          <h2>
+            Ask about your company policies
+          </h2>
+
+          <p>
+            Get answers from the latest
+            approved company documents.
+          </p>
+
+        </section>
+
+
+        {/* ------------------------------------------- */}
+        {/* Question card */}
+        {/* ------------------------------------------- */}
+
+        <section className="question-card">
+
+          <form
+            onSubmit={
+              handleAsk
             }
           >
-            {loading
-              ? "Thinking..."
-              : "Ask"}
-          </button>
-        </form>
+
+            <label
+              className="field-label"
+            >
+              Policy
+            </label>
+
+            {loadingDocuments ? (
+              <div className="loading-box">
+                Loading policies...
+              </div>
+            ) : documents.length === 0 ? (
+              <div className="empty-box">
+                <strong>
+                  No approved policies
+                </strong>
+
+                <p>
+                  There are currently no
+                  approved documents available.
+                </p>
+              </div>
+            ) : (
+              <select
+                className="policy-select"
+                value={
+                  selectedDocumentId
+                }
+                onChange={
+                  handleDocumentChange
+                }
+              >
+                {documents.map(
+                  (document) => (
+                    <option
+                      key={
+                        document.id
+                      }
+                      value={
+                        document.id
+                      }
+                    >
+                      {document.name}
+                    </option>
+                  )
+                )}
+              </select>
+            )}
+
+
+            <label
+              className="field-label question-label"
+            >
+              Your question
+            </label>
+
+            <textarea
+              className="question-input"
+              value={
+                question
+              }
+              onChange={(
+                event
+              ) =>
+                setQuestion(
+                  event.target.value
+                )
+              }
+              placeholder="e.g. How many vacation days do employees get?"
+              rows={5}
+              disabled={
+                loadingDocuments ||
+                documents.length === 0 ||
+                loadingAnswer
+              }
+            />
+
+
+            <div className="question-footer">
+
+              <span className="input-hint">
+                Ask a clear question about
+                the selected policy.
+              </span>
+
+              <button
+                type="submit"
+                className="primary-button"
+                disabled={
+                  loadingAnswer ||
+                  loadingDocuments ||
+                  documents.length === 0 ||
+                  !question.trim()
+                }
+              >
+                {loadingAnswer
+                  ? "Thinking..."
+                  : "Ask question"}
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+
+        {/* ------------------------------------------- */}
+        {/* Error */}
+        {/* ------------------------------------------- */}
 
         {error && (
-          <p>
-            {error}
-          </p>
-        )}
-
-        {result && (
-          <section>
-            <h3>
-              Answer
-            </h3>
+          <section className="error-card">
+            <strong>
+              Something went wrong
+            </strong>
 
             <p>
-              {result.answer}
+              {error}
             </p>
-
-            <h3>
-              Sources
-            </h3>
-
-            {result.sources.map(
-              (
-                source,
-                index
-              ) => (
-                <article
-                  key={
-                    `${source.version_number}-${source.chunk_index}-${index}`
-                  }
-                >
-                  <strong>
-                    {
-                      source.document_name
-                    }
-                  </strong>
-
-                  <span>
-                    {" "}
-                    • v
-                    {
-                      source.version_number
-                    }
-                  </span>
-
-                  <p>
-                    {
-                      source.text
-                    }
-                  </p>
-                </article>
-              )
-            )}
           </section>
         )}
-      </section>
-    </main>
+
+
+        {/* ------------------------------------------- */}
+        {/* Answer */}
+        {/* ------------------------------------------- */}
+
+        {result && (
+          <section className="answer-section">
+
+            <div className="section-heading">
+              <div>
+                <span className="section-kicker">
+                  RESPONSE
+                </span>
+
+                <h3>
+                  Answer
+                </h3>
+              </div>
+            </div>
+
+
+            <div className="answer-card">
+
+              <p className="answer-text">
+                {result.answer}
+              </p>
+
+            </div>
+
+
+            {/* --------------------------------------- */}
+            {/* Sources */}
+            {/* --------------------------------------- */}
+
+            <div className="sources-header">
+              <span className="section-kicker">
+                SOURCES
+              </span>
+
+              <h3>
+                Based on
+              </h3>
+            </div>
+
+
+            <div className="sources-list">
+
+              {result.sources.map(
+                (
+                  source,
+                  index
+                ) => (
+                  <article
+                    className="source-card"
+                    key={
+                      `${source.version_number}-${source.chunk_index}-${index}`
+                    }
+                  >
+
+                    <div className="source-top">
+
+                      <div>
+                        <strong>
+                          {
+                            source.document_name
+                          }
+                        </strong>
+
+                        <span>
+                          Version v
+                          {
+                            source.version_number
+                          }
+                        </span>
+                      </div>
+
+                      <span className="source-badge">
+                        Source
+                      </span>
+
+                    </div>
+
+
+                    <p>
+                      {
+                        source.text
+                      }
+                    </p>
+
+                  </article>
+                )
+              )}
+
+            </div>
+
+          </section>
+        )}
+
+      </main>
+
+    </div>
   );
 }

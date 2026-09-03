@@ -1,6 +1,4 @@
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
 import {
   Navigate,
@@ -17,8 +15,7 @@ export default function Login() {
     user,
   } = useAuth();
 
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
   const [
     username,
@@ -99,9 +96,8 @@ export default function Login() {
     } catch (err) {
       setError(
         err.message ||
-          "Login failed."
+          "Unable to sign in. Please check your credentials."
       );
-
     } finally {
       setLoading(false);
     }
@@ -109,78 +105,159 @@ export default function Login() {
 
 
   return (
-    <main>
-      <section>
-        <h1>
-          Drift RAG
-        </h1>
+    <div className="login-page">
 
-        <p>
-          Company Knowledge
-          Assistant
+      <div className="login-shell">
+
+        {/* ---------------------------------------- */}
+        {/* Brand */}
+        {/* ---------------------------------------- */}
+
+        <div className="login-brand">
+
+          <div className="login-brand-mark">
+            DR
+          </div>
+
+          <div>
+            <div className="login-brand-name">
+              Drift RAG
+            </div>
+
+            <div className="login-brand-subtitle">
+              Company Knowledge Platform
+            </div>
+          </div>
+
+        </div>
+
+
+        {/* ---------------------------------------- */}
+        {/* Login card */}
+        {/* ---------------------------------------- */}
+
+        <section className="login-card">
+
+          <div className="login-heading">
+
+            <span className="section-kicker">
+              SECURE ACCESS
+            </span>
+
+            <h1>
+              Welcome back
+            </h1>
+
+            <p>
+              Sign in to access your
+              company knowledge.
+            </p>
+
+          </div>
+
+
+          <form
+            className="login-form"
+            onSubmit={
+              handleSubmit
+            }
+          >
+
+            <label>
+              <span>
+                Username
+              </span>
+
+              <input
+                type="text"
+                value={
+                  username
+                }
+                onChange={(
+                  event
+                ) =>
+                  setUsername(
+                    event.target.value
+                  )
+                }
+                placeholder="Enter your username"
+                autoComplete="username"
+                autoFocus
+                required
+              />
+            </label>
+
+
+            <label>
+              <span>
+                Password
+              </span>
+
+              <input
+                type="password"
+                value={
+                  password
+                }
+                onChange={(
+                  event
+                ) =>
+                  setPassword(
+                    event.target.value
+                  )
+                }
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                required
+              />
+            </label>
+
+
+            {error && (
+              <div className="login-error">
+                <strong>
+                  Sign in failed
+                </strong>
+
+                <span>
+                  {error}
+                </span>
+              </div>
+            )}
+
+
+            <button
+              type="submit"
+              className="login-button"
+              disabled={loading}
+            >
+              {loading
+                ? "Signing in..."
+                : "Sign in"}
+            </button>
+
+          </form>
+
+
+          <div className="login-footer">
+            <span>
+              Your access is protected
+              by role-based permissions.
+            </span>
+          </div>
+
+        </section>
+
+
+        {/* ---------------------------------------- */}
+        {/* Footer */}
+        {/* ---------------------------------------- */}
+
+        <p className="login-copyright">
+          Drift RAG · Company Knowledge
         </p>
 
-        <form
-          onSubmit={
-            handleSubmit
-          }
-        >
-          <label>
-            Username
+      </div>
 
-            <input
-              type="text"
-              value={
-                username
-              }
-              onChange={(
-                event
-              ) =>
-                setUsername(
-                  event.target.value
-                )
-              }
-              autoComplete="username"
-              required
-            />
-          </label>
-
-          <label>
-            Password
-
-            <input
-              type="password"
-              value={
-                password
-              }
-              onChange={(
-                event
-              ) =>
-                setPassword(
-                  event.target.value
-                )
-              }
-              autoComplete="current-password"
-              required
-            />
-          </label>
-
-          {error && (
-            <p>
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {loading
-              ? "Signing in..."
-              : "Sign in"}
-          </button>
-        </form>
-      </section>
-    </main>
+    </div>
   );
 }

@@ -22,19 +22,17 @@ async function request(
   let data = null;
 
   try {
-    data =
-      await response.json();
+    data = await response.json();
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    const error =
-      new Error(
-        data?.detail ||
-          data?.error ||
-          "Request failed."
-      );
+    const error = new Error(
+      data?.detail ||
+        data?.error ||
+        "Request failed."
+    );
 
     error.status =
       response.status;
@@ -57,12 +55,10 @@ async function uploadRequest(
     `${API_BASE_URL}${path}`,
     {
       method: "POST",
-
       headers: {
         Authorization:
           `Bearer ${token}`,
       },
-
       body: formData,
     }
   );
@@ -70,19 +66,17 @@ async function uploadRequest(
   let data = null;
 
   try {
-    data =
-      await response.json();
+    data = await response.json();
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    const error =
-      new Error(
-        data?.detail ||
-          data?.error ||
-          "Upload failed."
-      );
+    const error = new Error(
+      data?.detail ||
+        data?.error ||
+        "Upload failed."
+    );
 
     error.status =
       response.status;
@@ -108,7 +102,6 @@ export async function login(
     "/auth/login",
     {
       method: "POST",
-
       body: JSON.stringify({
         username,
         password,
@@ -119,7 +112,7 @@ export async function login(
 
 
 // --------------------------------------------------
-// Create new document
+// Documents
 // --------------------------------------------------
 
 export async function createDocument(
@@ -130,12 +123,10 @@ export async function createDocument(
     "/documents/",
     {
       method: "POST",
-
       headers: {
         Authorization:
           `Bearer ${token}`,
       },
-
       body: JSON.stringify({
         name,
       }),
@@ -144,44 +135,26 @@ export async function createDocument(
 }
 
 
-// --------------------------------------------------
-// Employee Query
-// --------------------------------------------------
-
-export async function queryDocument(
-  documentId,
-  question,
-  topK = 3,
-  token
-) {
-  return request(
-    `/documents/${documentId}/query`,
-    {
-      method: "POST",
-
-      headers: {
-        Authorization:
-          `Bearer ${token}`,
-      },
-
-      body: JSON.stringify({
-        question,
-        top_k: topK,
-      }),
-    }
-  );
-}
-
-
-// --------------------------------------------------
-// Documents
-// --------------------------------------------------
-
 export async function getDocuments(
   token
 ) {
   return request(
     "/documents/",
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+      },
+    }
+  );
+}
+
+
+export async function getAvailableDocuments(
+  token
+) {
+  return request(
+    "/documents/available",
     {
       headers: {
         Authorization:
@@ -272,11 +245,37 @@ export async function approveVersion(
     `/documents/${documentId}/versions/${versionNumber}/approve`,
     {
       method: "POST",
-
       headers: {
         Authorization:
           `Bearer ${token}`,
       },
+    }
+  );
+}
+
+
+// --------------------------------------------------
+// Employee query
+// --------------------------------------------------
+
+export async function queryDocument(
+  documentId,
+  question,
+  topK = 3,
+  token
+) {
+  return request(
+    `/documents/${documentId}/query`,
+    {
+      method: "POST",
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        question,
+        top_k: topK,
+      }),
     }
   );
 }
@@ -295,12 +294,10 @@ export async function analyzeDrift(
     `/documents/${documentId}/drift`,
     {
       method: "POST",
-
       headers: {
         Authorization:
           `Bearer ${token}`,
       },
-
       body: JSON.stringify(
         payload
       ),

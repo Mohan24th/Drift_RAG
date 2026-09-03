@@ -33,10 +33,6 @@ export default function AdminDashboard() {
   } = useAuth();
 
 
-  // --------------------------------------------------
-  // Documents
-  // --------------------------------------------------
-
   const [
     documents,
     setDocuments,
@@ -63,8 +59,8 @@ export default function AdminDashboard() {
   ] = useState(true);
 
   const [
-    loadingDocumentDetails,
-    setLoadingDocumentDetails,
+    loadingDetails,
+    setLoadingDetails,
   ] = useState(false);
 
 
@@ -73,48 +69,33 @@ export default function AdminDashboard() {
   // --------------------------------------------------
 
   const [
-    showCreateDocument,
-    setShowCreateDocument,
+    showCreate,
+    setShowCreate,
   ] = useState(false);
 
   const [
-    newDocumentName,
-    setNewDocumentName,
+    documentName,
+    setDocumentName,
   ] = useState("");
 
   const [
-    newDocumentFile,
-    setNewDocumentFile,
+    documentFile,
+    setDocumentFile,
   ] = useState(null);
 
   const [
-    creatingDocument,
-    setCreatingDocument,
+    creating,
+    setCreating,
   ] = useState(false);
 
 
   // --------------------------------------------------
-  // General messages
+  // Upload version
   // --------------------------------------------------
 
   const [
-    error,
-    setError,
-  ] = useState("");
-
-  const [
-    message,
-    setMessage,
-  ] = useState("");
-
-
-  // --------------------------------------------------
-  // Existing version upload
-  // --------------------------------------------------
-
-  const [
-    selectedFile,
-    setSelectedFile,
+    uploadFile,
+    setUploadFile,
   ] = useState(null);
 
   const [
@@ -150,9 +131,24 @@ export default function AdminDashboard() {
   ] = useState(null);
 
   const [
-    analyzingDrift,
-    setAnalyzingDrift,
+    analyzing,
+    setAnalyzing,
   ] = useState(false);
+
+
+  // --------------------------------------------------
+  // Messages
+  // --------------------------------------------------
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    message,
+    setMessage,
+  ] = useState("");
 
 
   // --------------------------------------------------
@@ -162,7 +158,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function loadDocuments() {
       setLoadingDocuments(true);
-      setError("");
 
       try {
         const data =
@@ -170,7 +165,9 @@ export default function AdminDashboard() {
             token
           );
 
-        setDocuments(data);
+        setDocuments(
+          data
+        );
 
         if (
           data.length > 0 &&
@@ -180,7 +177,6 @@ export default function AdminDashboard() {
             data[0].id
           );
         }
-
       } catch (err) {
         setError(
           err.message ||
@@ -211,13 +207,9 @@ export default function AdminDashboard() {
       return;
     }
 
-    async function loadDocumentDetails() {
-      setLoadingDocumentDetails(
-        true
-      );
-
+    async function loadDetails() {
+      setLoadingDetails(true);
       setError("");
-      setMessage("");
       setDriftResult(null);
 
       try {
@@ -244,7 +236,8 @@ export default function AdminDashboard() {
         );
 
         if (
-          documentVersions.length >= 2
+          documentVersions.length >=
+          2
         ) {
           setFromVersion(
             String(
@@ -259,7 +252,6 @@ export default function AdminDashboard() {
                 .version_number
             )
           );
-
         } else if (
           documentVersions.length === 1
         ) {
@@ -271,25 +263,23 @@ export default function AdminDashboard() {
           );
 
           setToVersion("");
-
         } else {
           setFromVersion("");
           setToVersion("");
         }
-
       } catch (err) {
         setError(
           err.message ||
             "Failed to load document details."
         );
       } finally {
-        setLoadingDocumentDetails(
+        setLoadingDetails(
           false
         );
       }
     }
 
-    loadDocumentDetails();
+    loadDetails();
   }, [
     selectedDocumentId,
     token,
@@ -300,7 +290,7 @@ export default function AdminDashboard() {
   // Derived values
   // --------------------------------------------------
 
-  const nextVersionNumber =
+  const nextVersion =
     useMemo(() => {
       if (
         versions.length === 0
@@ -323,10 +313,10 @@ export default function AdminDashboard() {
   // Refresh selected document
   // --------------------------------------------------
 
-  async function refreshSelectedDocument(
-    documentId = selectedDocumentId
-  ) {
-    if (!documentId) {
+  async function refreshDocument() {
+    if (
+      !selectedDocumentId
+    ) {
       return;
     }
 
@@ -335,11 +325,11 @@ export default function AdminDashboard() {
       documentVersions,
     ] = await Promise.all([
       getDocument(
-        documentId,
+        selectedDocumentId,
         token
       ),
       getDocumentVersions(
-        documentId,
+        selectedDocumentId,
         token
       ),
     ]);
@@ -351,11 +341,29 @@ export default function AdminDashboard() {
     setVersions(
       documentVersions
     );
+
+    if (
+      documentVersions.length >= 2
+    ) {
+      setFromVersion(
+        String(
+          documentVersions[1]
+            .version_number
+        )
+      );
+
+      setToVersion(
+        String(
+          documentVersions[0]
+            .version_number
+        )
+      );
+    }
   }
 
 
   // --------------------------------------------------
-  // Create new document + v1
+  // Create new document
   // --------------------------------------------------
 
   async function handleCreateDocument(
@@ -364,7 +372,7 @@ export default function AdminDashboard() {
     event.preventDefault();
 
     const name =
-      newDocumentName.trim();
+      documentName.trim();
 
     if (!name) {
       setError(
@@ -373,102 +381,65 @@ export default function AdminDashboard() {
       return;
     }
 
-    if (!newDocumentFile) {
+    if (!documentFile) {
       setError(
         "Choose a PDF or TXT file."
       );
       return;
     }
 
-    const extension =
-      newDocumentFile.name
-        .split(".")
-        .pop()
-        ?.toLowerCase();
-
-    if (
-      !["pdf", "txt"].includes(
-        extension
-      )
-    ) {
-      setError(
-        "Only PDF and TXT files are supported."
-      );
-      return;
-    }
-
-    setCreatingDocument(true);
+    setCreating(true);
     setError("");
     setMessage("");
 
     try {
-      // ----------------------------------------------
-      // 1. Create document metadata
-      // ----------------------------------------------
       const document =
         await createDocument(
           name,
           token
         );
 
-      // ----------------------------------------------
-      // 2. Upload first version
-      // ----------------------------------------------
       const version =
         await uploadDocumentVersion(
           document.id,
           1,
-          newDocumentFile,
+          documentFile,
           token
         );
 
-      // ----------------------------------------------
-      // 3. Refresh list
-      // ----------------------------------------------
-      const updatedDocuments =
+      const data =
         await getDocuments(
           token
         );
 
       setDocuments(
-        updatedDocuments
+        data
       );
 
-      // ----------------------------------------------
-      // 4. Select newly created document
-      // ----------------------------------------------
       setSelectedDocumentId(
         document.id
       );
 
-      // ----------------------------------------------
-      // 5. Reset form
-      // ----------------------------------------------
-      setNewDocumentName("");
-      setNewDocumentFile(null);
-      setShowCreateDocument(
-        false
-      );
+      setDocumentName("");
+      setDocumentFile(null);
+      setShowCreate(false);
 
       setMessage(
-        `${document.name} created successfully. Version v${version.version_number} is currently DRAFT.`
+        `${document.name} created. v${version.version_number} is waiting for approval.`
       );
-
     } catch (err) {
       setError(
         err.message ||
           "Failed to create document."
       );
     } finally {
-      setCreatingDocument(
-        false
-      );
+      setCreating(false);
     }
   }
 
 
   // --------------------------------------------------
-  // Existing version upload
+  // Upload next version
   // --------------------------------------------------
 
   async function handleUpload(
@@ -476,16 +447,7 @@ export default function AdminDashboard() {
   ) {
     event.preventDefault();
 
-    if (
-      !selectedDocumentId
-    ) {
-      setError(
-        "Select a document first."
-      );
-      return;
-    }
-
-    if (!selectedFile) {
+    if (!uploadFile) {
       setError(
         "Choose a PDF or TXT file."
       );
@@ -500,25 +462,24 @@ export default function AdminDashboard() {
       const result =
         await uploadDocumentVersion(
           selectedDocumentId,
-          nextVersionNumber,
-          selectedFile,
+          nextVersion,
+          uploadFile,
           token
         );
 
       setMessage(
-        `Version v${result.version_number} uploaded successfully as DRAFT.`
+        `v${result.version_number} uploaded and is waiting for approval.`
       );
 
-      setSelectedFile(null);
+      setUploadFile(null);
 
       event.target.reset();
 
-      await refreshSelectedDocument();
-
+      await refreshDocument();
     } catch (err) {
       setError(
         err.message ||
-          "Failed to upload document version."
+          "Failed to upload version."
       );
     } finally {
       setUploading(false);
@@ -527,12 +488,21 @@ export default function AdminDashboard() {
 
 
   // --------------------------------------------------
-  // Approve
+  // Approve version
   // --------------------------------------------------
 
   async function handleApprove(
     versionNumber
   ) {
+    const confirmed =
+      window.confirm(
+        `Approve version v${versionNumber}?`
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
     setError("");
     setMessage("");
 
@@ -544,15 +514,14 @@ export default function AdminDashboard() {
       );
 
       setMessage(
-        `Version v${versionNumber} has been approved.`
+        `v${versionNumber} is now approved.`
       );
 
-      await refreshSelectedDocument();
-
+      await refreshDocument();
     } catch (err) {
       setError(
         err.message ||
-          `Failed to approve v${versionNumber}.`
+          "Failed to approve version."
       );
     }
   }
@@ -568,15 +537,6 @@ export default function AdminDashboard() {
     event.preventDefault();
 
     if (
-      !selectedDocumentId
-    ) {
-      setError(
-        "Select a document first."
-      );
-      return;
-    }
-
-    if (
       !fromVersion ||
       !toVersion
     ) {
@@ -587,11 +547,11 @@ export default function AdminDashboard() {
     }
 
     if (
-      Number(fromVersion) ===
+      Number(fromVersion) >=
       Number(toVersion)
     ) {
       setError(
-        "Select two different versions."
+        "The 'from' version must be older than the 'to' version."
       );
       return;
     }
@@ -609,17 +569,13 @@ export default function AdminDashboard() {
       queries.length === 0
     ) {
       setError(
-        "Enter at least one drift query."
+        "Add at least one question for drift analysis."
       );
       return;
     }
 
-    setAnalyzingDrift(
-      true
-    );
-
+    setAnalyzing(true);
     setError("");
-    setMessage("");
     setDriftResult(null);
 
     try {
@@ -628,13 +584,9 @@ export default function AdminDashboard() {
           selectedDocumentId,
           {
             from_version:
-              Number(
-                fromVersion
-              ),
+              Number(fromVersion),
             to_version:
-              Number(
-                toVersion
-              ),
+              Number(toVersion),
             queries,
             top_k: 3,
           },
@@ -644,377 +596,175 @@ export default function AdminDashboard() {
       setDriftResult(
         result
       );
-
     } catch (err) {
       setError(
         err.message ||
           "Drift analysis failed."
       );
     } finally {
-      setAnalyzingDrift(
-        false
-      );
+      setAnalyzing(false);
     }
   }
 
 
   return (
-    <main>
+    <div className="admin-page">
 
-      {/* ------------------------------------------------ */}
+      {/* ------------------------------------------- */}
       {/* Header */}
-      {/* ------------------------------------------------ */}
+      {/* ------------------------------------------- */}
 
-      <header>
-        <div>
-          <h1>
-            Drift RAG Admin
-          </h1>
+      <header className="admin-header">
 
-          <p>
-            Signed in as{" "}
-            <strong>
-              {user.username}
-            </strong>{" "}
-            ({user.role})
-          </p>
+        <div className="brand">
+          <div className="brand-mark">
+            DR
+          </div>
+
+          <div>
+            <h1>
+              Drift RAG
+            </h1>
+
+            <span>
+              Administration
+            </span>
+          </div>
         </div>
 
-        <button
-          onClick={logout}
-          type="button"
-        >
-          Sign out
-        </button>
+
+        <div className="admin-user">
+
+          <div>
+            <strong>
+              {user.username}
+            </strong>
+
+            <span>
+              {user.role}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={logout}
+          >
+            Sign out
+          </button>
+
+        </div>
+
       </header>
 
 
-      {/* ------------------------------------------------ */}
-      {/* Global messages */}
-      {/* ------------------------------------------------ */}
+      {/* ------------------------------------------- */}
+      {/* Messages */}
+      {/* ------------------------------------------- */}
 
       {error && (
-        <article>
+        <div className="admin-alert error">
           <strong>
             Error
           </strong>
 
-          <p>
+          <span>
             {error}
-          </p>
-        </article>
+          </span>
+        </div>
       )}
 
 
       {message && (
-        <article>
+        <div className="admin-alert success">
           <strong>
-            Success
+            Done
           </strong>
 
-          <p>
+          <span>
             {message}
-          </p>
-        </article>
+          </span>
+        </div>
       )}
 
 
-      {/* ------------------------------------------------ */}
-      {/* Documents */}
-      {/* ------------------------------------------------ */}
+      {/* ------------------------------------------- */}
+      {/* Dashboard */}
+      {/* ------------------------------------------- */}
 
-      <section>
-        <header>
-          <h2>
-            Documents
-          </h2>
+      <main className="admin-layout">
 
-          <button
-            type="button"
-            onClick={() =>
-              setShowCreateDocument(
-                (current) =>
-                  !current
-              )
-            }
-          >
-            {showCreateDocument
-              ? "Cancel"
-              : "+ Add New Document"}
-          </button>
-        </header>
+        {/* ========================================= */}
+        {/* Sidebar */}
+        {/* ========================================= */}
+
+        <aside className="document-sidebar">
+
+          <div className="sidebar-header">
+            <div>
+              <span className="section-kicker">
+                KNOWLEDGE BASE
+              </span>
+
+              <h2>
+                Documents
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              className="add-button"
+              onClick={() =>
+                setShowCreate(
+                  !showCreate
+                )
+              }
+            >
+              {showCreate
+                ? "×"
+                : "+"}
+            </button>
+          </div>
 
 
-        {/* ---------------------------------------------- */}
-        {/* Create new document */}
-        {/* ---------------------------------------------- */}
+          {/* New document form */}
 
-        {showCreateDocument && (
-          <article>
-            <h3>
-              Create New Document
-            </h3>
-
+          {showCreate && (
             <form
+              className="create-document-form"
               onSubmit={
                 handleCreateDocument
               }
             >
-              <label>
-                Document name
+              <h3>
+                Add document
+              </h3>
 
-                <input
-                  type="text"
-                  value={
-                    newDocumentName
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    setNewDocumentName(
-                      event.target
-                        .value
-                    )
-                  }
-                  placeholder="Human Rights Policy"
-                  maxLength={200}
-                  required
-                />
-              </label>
-
-              <label>
-                Initial document
-
-                <input
-                  type="file"
-                  accept=".pdf,.txt"
-                  onChange={(
-                    event
-                  ) =>
-                    setNewDocumentFile(
-                      event.target
-                        .files?.[0] ||
-                        null
-                    )
-                  }
-                />
-              </label>
-
-              <p>
-                The uploaded file will
-                become version{" "}
-                <strong>
-                  v1 DRAFT
-                </strong>
-                . You can approve it
-                after reviewing it.
-              </p>
-
-              <button
-                type="submit"
-                disabled={
-                  creatingDocument
+              <input
+                type="text"
+                value={
+                  documentName
                 }
-              >
-                {creatingDocument
-                  ? "Creating..."
-                  : "Create Document"}
-              </button>
-            </form>
-          </article>
-        )}
-
-
-        {/* ---------------------------------------------- */}
-        {/* Document list */}
-        {/* ---------------------------------------------- */}
-
-        {loadingDocuments && (
-          <p>
-            Loading documents...
-          </p>
-        )}
-
-        {!loadingDocuments &&
-          documents.length ===
-            0 && (
-            <p>
-              No documents found.
-            </p>
-          )}
-
-        {!loadingDocuments &&
-          documents.length > 0 && (
-            <div>
-              {documents.map(
-                (document) => (
-                  <button
-                    key={
-                      document.id
-                    }
-                    type="button"
-                    onClick={() =>
-                      setSelectedDocumentId(
-                        document.id
-                      )
-                    }
-                  >
-                    {document.name}
-                  </button>
-                )
-              )}
-            </div>
-          )}
-      </section>
-
-
-      {/* ------------------------------------------------ */}
-      {/* Selected document */}
-      {/* ------------------------------------------------ */}
-
-      {selectedDocument && (
-        <>
-
-          <section>
-            <h2>
-              {
-                selectedDocument.name
-              }
-            </h2>
-
-            <p>
-              Created:{" "}
-              {new Date(
-                selectedDocument.created_at
-              ).toLocaleString()}
-            </p>
-
-            <p>
-              Versions:{" "}
-              {
-                selectedDocument
-                  .versions_count
-              }
-            </p>
-          </section>
-
-
-          {/* -------------------------------------------- */}
-          {/* Version history */}
-          {/* -------------------------------------------- */}
-
-          <section>
-            <h2>
-              Version History
-            </h2>
-
-            {loadingDocumentDetails && (
-              <p>
-                Loading versions...
-              </p>
-            )}
-
-            {!loadingDocumentDetails &&
-              versions.length ===
-                0 && (
-                <p>
-                  No versions found.
-                </p>
-              )}
-
-            {!loadingDocumentDetails &&
-              versions.map(
-                (version) => (
-                  <article
-                    key={
-                      version.id
-                    }
-                  >
-                    <h3>
-                      v
-                      {
-                        version.version_number
-                      }
-                    </h3>
-
-                    <p>
-                      Status:{" "}
-                      <strong>
-                        {
-                          version.status
-                        }
-                      </strong>
-                    </p>
-
-                    <p>
-                      Created:{" "}
-                      {new Date(
-                        version.created_at
-                      ).toLocaleString()}
-                    </p>
-
-                    {version.approved_at && (
-                      <p>
-                        Approved:{" "}
-                        {new Date(
-                          version.approved_at
-                        ).toLocaleString()}
-                      </p>
-                    )}
-
-                    {version.status ===
-                      "DRAFT" && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleApprove(
-                            version.version_number
-                          )
-                        }
-                      >
-                        Approve v
-                        {
-                          version.version_number
-                        }
-                      </button>
-                    )}
-                  </article>
-                )
-              )}
-          </section>
-
-
-          {/* -------------------------------------------- */}
-          {/* Upload next version */}
-          {/* -------------------------------------------- */}
-
-          <section>
-            <h2>
-              Upload New Version
-            </h2>
-
-            <p>
-              Next version:{" "}
-              <strong>
-                v
-                {
-                  nextVersionNumber
+                onChange={(
+                  event
+                ) =>
+                  setDocumentName(
+                    event.target
+                      .value
+                  )
                 }
-              </strong>
-            </p>
+                placeholder="Human Rights Policy"
+                maxLength={200}
+                required
+              />
 
-            <form
-              onSubmit={
-                handleUpload
-              }
-            >
               <input
                 type="file"
                 accept=".pdf,.txt"
                 onChange={(
                   event
                 ) =>
-                  setSelectedFile(
+                  setDocumentFile(
                     event.target
                       .files?.[0] ||
                       null
@@ -1024,320 +774,769 @@ export default function AdminDashboard() {
 
               <button
                 type="submit"
+                className="primary-button"
                 disabled={
-                  uploading ||
-                  !selectedFile
+                  creating
                 }
               >
-                {uploading
-                  ? "Uploading..."
-                  : "Upload Version"}
+                {creating
+                  ? "Creating..."
+                  : "Create & Upload v1"}
               </button>
             </form>
-          </section>
+          )}
 
 
-          {/* -------------------------------------------- */}
-          {/* Drift */}
-          {/* -------------------------------------------- */}
+          <div className="document-list">
 
-          <section>
-            <h2>
-              Drift Analysis
-            </h2>
-
-            {versions.length <
-              2 && (
-              <p>
-                At least two versions
-                are required for
-                comparison.
+            {loadingDocuments && (
+              <p className="muted">
+                Loading...
               </p>
             )}
 
-            {versions.length >=
-              2 && (
-              <form
-                onSubmit={
-                  handleAnalyzeDrift
-                }
-              >
-                <label>
-                  From version
+            {!loadingDocuments &&
+              documents.length ===
+                0 && (
+                <p className="muted">
+                  No documents yet.
+                </p>
+              )}
 
-                  <select
-                    value={
-                      fromVersion
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      setFromVersion(
-                        event.target
-                          .value
-                      )
-                    }
-                  >
-                    <option value="">
-                      Select version
-                    </option>
-
-                    {versions.map(
-                      (
-                        version
-                      ) => (
-                        <option
-                          key={
-                            version.id
-                          }
-                          value={
-                            version.version_number
-                          }
-                        >
-                          v
-                          {
-                            version.version_number
-                          }{" "}
-                          (
-                          {
-                            version.status
-                          }
-                          )
-                        </option>
-                      )
-                    )}
-                  </select>
-                </label>
-
-                <label>
-                  To version
-
-                  <select
-                    value={
-                      toVersion
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      setToVersion(
-                        event.target
-                          .value
-                      )
-                    }
-                  >
-                    <option value="">
-                      Select version
-                    </option>
-
-                    {versions.map(
-                      (
-                        version
-                      ) => (
-                        <option
-                          key={
-                            version.id
-                          }
-                          value={
-                            version.version_number
-                          }
-                        >
-                          v
-                          {
-                            version.version_number
-                          }{" "}
-                          (
-                          {
-                            version.status
-                          }
-                          )
-                        </option>
-                      )
-                    )}
-                  </select>
-                </label>
-
-                <label>
-                  Queries
-
-                  <textarea
-                    rows={8}
-                    value={
-                      driftQueries
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      setDriftQueries(
-                        event.target
-                          .value
-                      )
-                    }
-                  />
-                </label>
-
+            {documents.map(
+              (document) => (
                 <button
-                  type="submit"
-                  disabled={
-                    analyzingDrift
+                  key={
+                    document.id
+                  }
+                  type="button"
+                  className={
+                    selectedDocumentId ===
+                    document.id
+                      ? "document-item active"
+                      : "document-item"
+                  }
+                  onClick={() =>
+                    setSelectedDocumentId(
+                      document.id
+                    )
                   }
                 >
-                  {analyzingDrift
-                    ? "Analyzing..."
-                    : "Run Drift Analysis"}
+                  <span className="document-icon">
+                    DOC
+                  </span>
+
+                  <span>
+                    <strong>
+                      {
+                        document.name
+                      }
+                    </strong>
+
+                    <small>
+                      {new Date(
+                        document.created_at
+                      ).toLocaleDateString()}
+                    </small>
+                  </span>
                 </button>
-              </form>
+              )
             )}
-          </section>
+
+          </div>
+
+        </aside>
 
 
-          {/* -------------------------------------------- */}
-          {/* Drift result */}
-          {/* -------------------------------------------- */}
+        {/* ========================================= */}
+        {/* Content */}
+        {/* ========================================= */}
 
-          {driftResult && (
-            <section>
+        <section className="admin-content">
+
+          {!selectedDocument && (
+            <div className="empty-dashboard">
+              <div className="empty-icon">
+                DR
+              </div>
+
               <h2>
-                Drift Result
+                Select a document
               </h2>
 
-              <article>
-                <h3>
-                  Overall Drift:{" "}
-                  {
-                    driftResult.overall_level
-                  }
-                </h3>
+              <p>
+                Choose a document from
+                the knowledge base to
+                manage versions and
+                review drift.
+              </p>
+            </div>
+          )}
 
-                <p>
-                  Overall score:{" "}
-                  {
-                    driftResult.overall_score
-                  }
-                </p>
 
-                <p>
-                  Queries evaluated:{" "}
-                  {
-                    driftResult.queries_evaluated
-                  }
-                </p>
+          {selectedDocument && (
+            <>
 
-                <p>
-                  Affected queries:{" "}
-                  {
-                    driftResult.affected_queries
-                  }
-                  {" / "}
-                  {
-                    driftResult.queries_evaluated
-                  }
-                </p>
-              </article>
+              {/* ----------------------------------- */}
+              {/* Document header */}
+              {/* ----------------------------------- */}
 
-              {driftResult.reports.map(
-                (
-                  report,
-                  index
-                ) => (
-                  <article
-                    key={`${report.query}-${index}`}
-                  >
+              <div className="document-heading">
+
+                <div>
+                  <span className="section-kicker">
+                    DOCUMENT
+                  </span>
+
+                  <h2>
+                    {
+                      selectedDocument.name
+                    }
+                  </h2>
+
+                  <p>
+                    {
+                      selectedDocument
+                        .versions_count
+                    }{" "}
+                    version
+                    {
+                      selectedDocument
+                        .versions_count === 1
+                        ? ""
+                        : "s"
+                    }
+                  </p>
+                </div>
+
+                <div className="document-meta">
+                  Created{" "}
+                  {new Date(
+                    selectedDocument.created_at
+                  ).toLocaleDateString()}
+                </div>
+
+              </div>
+
+
+              {/* ----------------------------------- */}
+              {/* Version history */}
+              {/* ----------------------------------- */}
+
+              <section className="admin-card">
+
+                <div className="card-header">
+                  <div>
+                    <span className="section-kicker">
+                      HISTORY
+                    </span>
+
                     <h3>
-                      {report.query}
+                      Versions
+                    </h3>
+                  </div>
+                </div>
+
+
+                {loadingDetails ? (
+                  <p className="muted">
+                    Loading versions...
+                  </p>
+                ) : versions.length ===
+                  0 ? (
+                  <div className="empty-state">
+                    <strong>
+                      No versions uploaded
+                    </strong>
+
+                    <span>
+                      Upload the first version
+                      using the panel below.
+                    </span>
+                  </div>
+                ) : (
+                  <div className="version-list">
+
+                    {versions.map(
+                      (version) => (
+                        <div
+                          className="version-row"
+                          key={
+                            version.id
+                          }
+                        >
+
+                          <div className="version-number">
+                            <strong>
+                              v
+                              {
+                                version.version_number
+                              }
+                            </strong>
+                          </div>
+
+
+                          <div className="version-info">
+                            <strong>
+                              {
+                                version.status
+                              }
+                            </strong>
+
+                            <span>
+                              Uploaded{" "}
+                              {new Date(
+                                version.created_at
+                              ).toLocaleDateString()}
+                            </span>
+                          </div>
+
+
+                          <span
+                            className={
+                              version.status ===
+                              "APPROVED"
+                                ? "status-badge approved"
+                                : "status-badge draft"
+                            }
+                          >
+                            {
+                              version.status ===
+                              "APPROVED"
+                                ? "Approved"
+                                : "Draft"
+                            }
+                          </span>
+
+
+                          {version.status ===
+                            "DRAFT" && (
+                            <button
+                              type="button"
+                              className="approve-button"
+                              onClick={() =>
+                                handleApprove(
+                                  version.version_number
+                                )
+                              }
+                            >
+                              Approve
+                            </button>
+                          )}
+
+                        </div>
+                      )
+                    )}
+
+                  </div>
+                )}
+
+              </section>
+
+
+              {/* ----------------------------------- */}
+              {/* Upload */}
+              {/* ----------------------------------- */}
+
+              <section className="admin-card">
+
+                <div className="card-header">
+                  <div>
+                    <span className="section-kicker">
+                      DOCUMENT MANAGEMENT
+                    </span>
+
+                    <h3>
+                      Upload new version
                     </h3>
 
                     <p>
-                      Retrieval overlap:{" "}
-                      {
-                        report.retrieval_overlap
-                      }
+                      This will create{" "}
+                      <strong>
+                        v
+                        {
+                          nextVersion
+                        }
+                      </strong>{" "}
+                      as a draft.
                     </p>
+                  </div>
+                </div>
 
-                    <p>
-                      Rank change:{" "}
-                      {
-                        report.rank_change
+
+                <form
+                  className="upload-area"
+                  onSubmit={
+                    handleUpload
+                  }
+                >
+
+                  <label className="file-picker">
+
+                    <input
+                      type="file"
+                      accept=".pdf,.txt"
+                      onChange={(
+                        event
+                      ) =>
+                        setUploadFile(
+                          event.target
+                            .files?.[0] ||
+                            null
+                        )
                       }
-                    </p>
+                    />
 
-                    <p>
-                      Semantic change:{" "}
-                      {
-                        report.semantic_change
-                      }
-                    </p>
+                    <span>
+                      {uploadFile
+                        ? uploadFile.name
+                        : "Choose a PDF or TXT file"}
+                    </span>
 
-                    {report.changes
-                      ?.length > 0 && (
-                      <div>
-                        <h4>
-                          Changes
-                        </h4>
+                    <small>
+                      Maximum 10 MB
+                    </small>
 
-                        {report.changes.map(
-                          (
-                            change,
-                            changeIndex
-                          ) => (
-                            <article
-                              key={
-                                `${change.chunk_index}-${changeIndex}`
-                              }
-                            >
-                              <p>
-                                <strong>
-                                  Chunk{" "}
-                                  {
-                                    change.chunk_index
-                                  }
-                                </strong>
-                                {" — "}
-                                {
-                                  change.change_type
+                  </label>
+
+
+                  <button
+                    type="submit"
+                    className="primary-button"
+                    disabled={
+                      uploading ||
+                      !uploadFile
+                    }
+                  >
+                    {uploading
+                      ? "Uploading..."
+                      : `Upload v${nextVersion}`}
+                  </button>
+
+                </form>
+
+              </section>
+
+
+              {/* ----------------------------------- */}
+              {/* Drift */}
+              {/* ----------------------------------- */}
+
+              {versions.length >=
+                2 && (
+                <section className="admin-card">
+
+                  <div className="card-header">
+                    <div>
+                      <span className="section-kicker">
+                        POLICY ANALYSIS
+                      </span>
+
+                      <h3>
+                        Compare versions
+                      </h3>
+
+                      <p>
+                        Find questions whose
+                        answers may have changed.
+                      </p>
+                    </div>
+                  </div>
+
+
+                  <form
+                    className="drift-form"
+                    onSubmit={
+                      handleAnalyzeDrift
+                    }
+                  >
+
+                    <div className="version-selects">
+
+                      <label>
+                        <span>
+                          From
+                        </span>
+
+                        <select
+                          value={
+                            fromVersion
+                          }
+                          onChange={(
+                            event
+                          ) =>
+                            setFromVersion(
+                              event.target
+                                .value
+                            )
+                          }
+                        >
+                          <option value="">
+                            Select
+                          </option>
+
+                          {versions.map(
+                            (
+                              version
+                            ) => (
+                              <option
+                                key={
+                                  version.id
                                 }
-                              </p>
+                                value={
+                                  version.version_number
+                                }
+                              >
+                                v
+                                {
+                                  version.version_number
+                                }
+                              </option>
+                            )
+                          )}
+                        </select>
+                      </label>
 
-                              {change.v1_text && (
-                                <div>
-                                  <strong>
-                                    Previous
-                                    version
-                                  </strong>
 
-                                  <p>
-                                    {
-                                      change.v1_text
-                                    }
-                                  </p>
-                                </div>
-                              )}
+                      <span className="version-arrow">
+                        →
+                      </span>
 
-                              {change.v2_text && (
-                                <div>
-                                  <strong>
-                                    New version
-                                  </strong>
 
-                                  <p>
-                                    {
-                                      change.v2_text
-                                    }
-                                  </p>
-                                </div>
-                              )}
-                            </article>
+                      <label>
+                        <span>
+                          To
+                        </span>
+
+                        <select
+                          value={
+                            toVersion
+                          }
+                          onChange={(
+                            event
+                          ) =>
+                            setToVersion(
+                              event.target
+                                .value
+                            )
+                          }
+                        >
+                          <option value="">
+                            Select
+                          </option>
+
+                          {versions.map(
+                            (
+                              version
+                            ) => (
+                              <option
+                                key={
+                                  version.id
+                                }
+                                value={
+                                  version.version_number
+                                }
+                              >
+                                v
+                                {
+                                  version.version_number
+                                }
+                              </option>
+                            )
+                          )}
+                        </select>
+                      </label>
+
+                    </div>
+
+
+                    <label>
+                      <span>
+                        Questions to evaluate
+                      </span>
+
+                      <textarea
+                        rows={5}
+                        value={
+                          driftQueries
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          setDriftQueries(
+                            event.target
+                              .value
                           )
-                        )}
-                      </div>
-                    )}
-                  </article>
-                )
+                        }
+                      />
+
+                      <small>
+                        One question per line.
+                      </small>
+                    </label>
+
+
+                    <button
+                      type="submit"
+                      className="primary-button"
+                      disabled={
+                        analyzing
+                      }
+                    >
+                      {analyzing
+                        ? "Analyzing..."
+                        : "Run drift analysis"}
+                    </button>
+
+                  </form>
+
+                </section>
               )}
-            </section>
+
+
+              {/* ----------------------------------- */}
+              {/* Drift results */}
+              {/* ----------------------------------- */}
+
+              {driftResult && (
+                <section className="drift-results">
+
+                  <div className="drift-summary">
+
+                    <div>
+                      <span className="section-kicker">
+                        DRIFT RESULT
+                      </span>
+
+                      <h3>
+                        v
+                        {
+                          driftResult.from_version
+                        }
+                        {" "}
+                        →
+                        {" "}
+                        v
+                        {
+                          driftResult.to_version
+                        }
+                      </h3>
+                    </div>
+
+
+                    <div className="drift-stat">
+                      <span>
+                        Overall
+                      </span>
+
+                      <strong>
+                        {
+                          driftResult
+                            .overall_level
+                        }
+                      </strong>
+                    </div>
+
+
+                    <div className="drift-stat">
+                      <span>
+                        Score
+                      </span>
+
+                      <strong>
+                        {Number(
+                          driftResult
+                            .overall_score
+                        ).toFixed(3)}
+                      </strong>
+                    </div>
+
+
+                    <div className="drift-stat">
+                      <span>
+                        Affected
+                      </span>
+
+                      <strong>
+                        {
+                          driftResult
+                            .affected_queries
+                        }
+                        /
+                        {
+                          driftResult
+                            .queries_evaluated
+                        }
+                      </strong>
+                    </div>
+
+                  </div>
+
+
+                  <div className="drift-reports">
+
+                    {driftResult.reports.map(
+                      (
+                        report,
+                        index
+                      ) => (
+                        <article
+                          className="drift-report"
+                          key={`${report.query}-${index}`}
+                        >
+
+                          <div className="report-header">
+
+                            <div>
+                              <span className="report-number">
+                                {index + 1}
+                              </span>
+
+                              <h4>
+                                {
+                                  report.query
+                                }
+                              </h4>
+                            </div>
+
+                          </div>
+
+
+                          <div className="metrics-grid">
+
+                            <div>
+                              <span>
+                                Retrieval overlap
+                              </span>
+
+                              <strong>
+                                {(
+                                  report
+                                    .retrieval_overlap *
+                                  100
+                                ).toFixed(0)}
+                                %
+                              </strong>
+                            </div>
+
+                            <div>
+                              <span>
+                                Rank change
+                              </span>
+
+                              <strong>
+                                {(
+                                  report
+                                    .rank_change *
+                                  100
+                                ).toFixed(0)}
+                                %
+                              </strong>
+                            </div>
+
+                            <div>
+                              <span>
+                                Semantic change
+                              </span>
+
+                              <strong>
+                                {(
+                                  report
+                                    .semantic_change *
+                                  100
+                                ).toFixed(1)}
+                                %
+                              </strong>
+                            </div>
+
+                          </div>
+
+
+                          {report.changes
+                            ?.length >
+                            0 && (
+                            <div className="changes-list">
+
+                              <span className="section-kicker">
+                                CHANGES
+                              </span>
+
+                              {report.changes.map(
+                                (
+                                  change,
+                                  changeIndex
+                                ) => (
+                                  <div
+                                    className="change-item"
+                                    key={`${change.chunk_index}-${changeIndex}`}
+                                  >
+
+                                    <div className="change-type">
+                                      {
+                                        change.change_type
+                                      }
+
+                                      {" · Chunk "}
+                                      {
+                                        change.chunk_index
+                                      }
+                                    </div>
+
+
+                                    <div className="change-columns">
+
+                                      <div>
+                                        <span>
+                                          Previous
+                                        </span>
+
+                                        <p>
+                                          {
+                                            change.v1_text ||
+                                            "Not present"
+                                          }
+                                        </p>
+                                      </div>
+
+
+                                      <div>
+                                        <span>
+                                          New
+                                        </span>
+
+                                        <p>
+                                          {
+                                            change.v2_text ||
+                                            "Not present"
+                                          }
+                                        </p>
+                                      </div>
+
+                                    </div>
+
+                                  </div>
+                                )
+                              )}
+
+                            </div>
+                          )}
+
+                        </article>
+                      )
+                    )}
+
+                  </div>
+
+                </section>
+              )}
+
+            </>
           )}
 
-        </>
-      )}
-    </main>
+        </section>
+
+      </main>
+
+    </div>
   );
 }
