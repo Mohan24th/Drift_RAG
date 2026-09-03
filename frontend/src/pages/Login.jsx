@@ -1,12 +1,14 @@
 import {
   useState,
 } from "react";
+
 import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
 
 import { useAuth } from "../auth/AuthContext";
+
 
 export default function Login() {
   const {
@@ -38,6 +40,7 @@ export default function Login() {
     setLoading,
   ] = useState(false);
 
+
   if (isAuthenticated) {
     if (
       user?.role === "EMPLOYEE"
@@ -57,6 +60,7 @@ export default function Login() {
       />
     );
   }
+
 
   async function handleSubmit(
     event
@@ -79,23 +83,30 @@ export default function Login() {
       ) {
         navigate(
           "/app",
-          { replace: true }
+          {
+            replace: true,
+          }
         );
       } else {
         navigate(
           "/admin",
-          { replace: true }
+          {
+            replace: true,
+          }
         );
       }
+
     } catch (err) {
       setError(
         err.message ||
           "Login failed."
       );
+
     } finally {
       setLoading(false);
     }
   }
+
 
   return (
     <main>
@@ -116,6 +127,7 @@ export default function Login() {
         >
           <label>
             Username
+
             <input
               type="text"
               value={
@@ -125,8 +137,7 @@ export default function Login() {
                 event
               ) =>
                 setUsername(
-                  event.target
-                    .value
+                  event.target.value
                 )
               }
               autoComplete="username"
@@ -136,6 +147,7 @@ export default function Login() {
 
           <label>
             Password
+
             <input
               type="password"
               value={
@@ -145,8 +157,7 @@ export default function Login() {
                 event
               ) =>
                 setPassword(
-                  event.target
-                    .value
+                  event.target.value
                 )
               }
               autoComplete="current-password"
@@ -162,9 +173,7 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={
-              loading
-            }
+            disabled={loading}
           >
             {loading
               ? "Signing in..."
