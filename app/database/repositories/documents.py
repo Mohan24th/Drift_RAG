@@ -193,3 +193,30 @@ class DocumentRepository:
         return self.session.execute(
             statement
         ).scalar_one_or_none()
+
+    def get_available_documents(
+        self,
+    ) -> list[DocumentModel]:
+
+        statement = (
+            select(DocumentModel)
+            .join(
+                DocumentVersionModel,
+                DocumentVersionModel.document_id
+                == DocumentModel.id,
+            )
+            .where(
+                DocumentVersionModel.status
+                == "APPROVED",
+            )
+            .distinct()
+            .order_by(
+                DocumentModel.name.asc()
+            )
+        )
+
+        return list(
+            self.session.execute(
+                statement
+            ).scalars().all()
+        )

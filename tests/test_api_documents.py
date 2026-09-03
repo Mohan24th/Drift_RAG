@@ -4,7 +4,9 @@ from app.api.main import app
 from app.api.routes import documents
 
 
-DOCUMENT_ID = "647e4ef2-d359-4a93-8a27-f4bece148ee1"
+DOCUMENT_ID = (
+    "647e4ef2-d359-4a93-8a27-f4bece148ee1"
+)
 
 
 class FakeDocument:
@@ -50,19 +52,31 @@ class FakeRepository:
     def __init__(self, session):
         self.session = session
 
-    def get_document_by_name(self, name):
+    def get_document_by_name(
+        self,
+        name,
+    ):
         return None
 
-    def create_document(self, document):
+    def create_document(
+        self,
+        document,
+    ):
         return document
 
-    def get_document_by_id(self, document_id):
+    def get_document_by_id(
+        self,
+        document_id,
+    ):
         if document_id == DOCUMENT_ID:
             return FakeDocument()
 
         return None
 
-    def get_next_version_number(self, document_id):
+    def get_next_version_number(
+        self,
+        document_id,
+    ):
         return 5
 
     def get_version(
@@ -79,13 +93,18 @@ class FakeRepository:
         return None
 
 
-class DuplicateRepository(FakeRepository):
-    def get_document_by_name(self, name):
+class DuplicateRepository(
+    FakeRepository
+):
+    def get_document_by_name(
+        self,
+        name,
+    ):
         return FakeDocument()
 
 
 def test_create_document(
-    client,
+    admin_client,
     monkeypatch,
 ):
     monkeypatch.setattr(
@@ -94,7 +113,7 @@ def test_create_document(
         FakeRepository,
     )
 
-    response = client.post(
+    response = admin_client.post(
         "/documents/",
         json={
             "name": "New Policy",
@@ -110,7 +129,7 @@ def test_create_document(
 
 
 def test_create_duplicate_document(
-    client,
+    admin_client,
     monkeypatch,
 ):
     monkeypatch.setattr(
@@ -119,7 +138,7 @@ def test_create_duplicate_document(
         DuplicateRepository,
     )
 
-    response = client.post(
+    response = admin_client.post(
         "/documents/",
         json={
             "name": "Test Policy",

@@ -18,7 +18,10 @@ from app.api.dependencies import (
     get_db,
     get_document_service,
 )
-from app.auth.dependencies import require_roles
+from app.auth.dependencies import (
+    get_current_user,
+    require_roles,
+)
 from app.auth.models import User
 from app.database.document_service import DocumentService
 from app.database.models import DocumentModel
@@ -78,6 +81,16 @@ class DocumentListItem(BaseModel):
     created_at: datetime
 
 
+class AvailableDocumentResponse(BaseModel):
+    id: str
+    name: str
+
+
+# --------------------------------------------------
+# Create document
+# HR / ADMIN only
+# --------------------------------------------------
+
 @router.post(
     "/",
     response_model=DocumentResponse,
@@ -85,6 +98,9 @@ class DocumentListItem(BaseModel):
 def create_document(
     request: CreateDocumentRequest,
     session: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles("HR", "ADMIN")
+    ),
 ):
     repository = DocumentRepository(
         session=session,
@@ -128,6 +144,11 @@ def create_document(
     )
 
 
+# --------------------------------------------------
+# List all documents
+# HR / ADMIN only
+# --------------------------------------------------
+
 @router.get(
     "/",
     response_model=list[DocumentListItem],
@@ -153,6 +174,43 @@ def list_documents(
         for document in documents
     ]
 
+
+# --------------------------------------------------
+# List documents available to employees
+# Only documents with an APPROVED version
+# --------------------------------------------------
+
+@router.get(
+    "/available",
+    response_model=list[AvailableDocumentResponse],
+)
+def get_available_documents(
+    session: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    repository = DocumentRepository(
+        session=session,
+    )
+
+    documents = (
+        repository.get_available_documents()
+    )
+
+    return [
+        AvailableDocumentResponse(
+            id=document.id,
+            name=document.name,
+        )
+        for document in documents
+    ]
+
+
+# --------------------------------------------------
+# Get document details
+# HR / ADMIN only
+# --------------------------------------------------
 
 @router.get(
     "/{document_id}",
@@ -187,9 +245,16 @@ def get_document(
         id=document.id,
         name=document.name,
         created_at=document.created_at,
-        versions_count=len(versions),
+        versions_count=len(
+            versions
+        ),
     )
 
+
+# --------------------------------------------------
+# Get document versions
+# HR / ADMIN only
+# --------------------------------------------------
 
 @router.get(
     "/{document_id}/versions",
@@ -232,6 +297,11 @@ def list_document_versions(
         for version in versions
     ]
 
+
+# --------------------------------------------------
+# Upload document version
+# HR / ADMIN only
+# --------------------------------------------------
 
 @router.post(
     "/{document_id}/versions",
@@ -302,7 +372,9 @@ async def upload_document_version(
     }:
         raise HTTPException(
             status_code=400,
-            detail="Only PDF and TXT files are supported.",
+            detail=(
+                "Only PDF and TXT files are supported."
+            ),
         )
 
     upload_temp_path = None
@@ -399,6 +471,11 @@ async def upload_document_version(
 
         await file.close()
 
+
+# --------------------------------------------------
+# Approve document version
+# HR / ADMIN only
+# --------------------------------------------------
 
 @router.post(
     "/{document_id}/versions/{version_number}/approve",
