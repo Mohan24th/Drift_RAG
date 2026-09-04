@@ -10,7 +10,8 @@ class EmbeddingModel:
     ):
         self.model = SentenceTransformer(
             model_name
-            or settings.embedding_model
+            or settings.embedding_model,
+            device="cpu",
         )
 
     def encode(

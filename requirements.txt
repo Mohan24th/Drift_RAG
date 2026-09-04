@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 sentence-transformers
 faiss-cpu
 numpy
@@ -13,3 +15,5 @@ python-multipart
 python-jose[cryptography]
 bcrypt
 supabase
+
+torch
