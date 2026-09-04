@@ -2,6 +2,17 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   "http://127.0.0.1:8000";
 
+const AUTH_STORAGE_KEY = "drift-rag-auth";
+
+
+function handleUnauthorized() {
+  localStorage.removeItem(
+    AUTH_STORAGE_KEY
+  );
+
+  window.location.href = "/login?expired=1";
+}
+
 
 async function request(
   path,
@@ -12,8 +23,7 @@ async function request(
     {
       ...options,
       headers: {
-        "Content-Type":
-          "application/json",
+        "Content-Type": "application/json",
         ...(options.headers || {}),
       },
     }
@@ -27,6 +37,19 @@ async function request(
     data = null;
   }
 
+  if (response.status === 401) {
+    handleUnauthorized();
+
+    const error = new Error(
+      "Your session has expired. Please sign in again."
+    );
+
+    error.status = 401;
+    error.data = data;
+
+    throw error;
+  }
+
   if (!response.ok) {
     const error = new Error(
       data?.detail ||
@@ -34,9 +57,7 @@ async function request(
         "Request failed."
     );
 
-    error.status =
-      response.status;
-
+    error.status = response.status;
     error.data = data;
 
     throw error;
@@ -71,6 +92,17 @@ async function uploadRequest(
     data = null;
   }
 
+  if (response.status === 401) {
+    handleUnauthorized();
+
+    const error = new Error(
+      "Your session has expired. Please sign in again."
+    );
+
+    error.status = 401;
+    throw error;
+  }
+
   if (!response.ok) {
     const error = new Error(
       data?.detail ||
@@ -78,9 +110,7 @@ async function uploadRequest(
         "Upload failed."
     );
 
-    error.status =
-      response.status;
-
+    error.status = response.status;
     error.data = data;
 
     throw error;
@@ -89,10 +119,6 @@ async function uploadRequest(
   return data;
 }
 
-
-// --------------------------------------------------
-// Authentication
-// --------------------------------------------------
 
 export async function login(
   username,
@@ -110,10 +136,6 @@ export async function login(
   );
 }
 
-
-// --------------------------------------------------
-// Documents
-// --------------------------------------------------
 
 export async function createDocument(
   name,
@@ -181,10 +203,6 @@ export async function getDocument(
 }
 
 
-// --------------------------------------------------
-// Versions
-// --------------------------------------------------
-
 export async function getDocumentVersions(
   documentId,
   token
@@ -200,10 +218,6 @@ export async function getDocumentVersions(
   );
 }
 
-
-// --------------------------------------------------
-// Upload version
-// --------------------------------------------------
 
 export async function uploadDocumentVersion(
   documentId,
@@ -232,10 +246,6 @@ export async function uploadDocumentVersion(
 }
 
 
-// --------------------------------------------------
-// Approve version
-// --------------------------------------------------
-
 export async function approveVersion(
   documentId,
   versionNumber,
@@ -253,10 +263,6 @@ export async function approveVersion(
   );
 }
 
-
-// --------------------------------------------------
-// Employee query
-// --------------------------------------------------
 
 export async function queryDocument(
   documentId,
@@ -280,10 +286,6 @@ export async function queryDocument(
   );
 }
 
-
-// --------------------------------------------------
-// Drift analysis
-// --------------------------------------------------
 
 export async function analyzeDrift(
   documentId,

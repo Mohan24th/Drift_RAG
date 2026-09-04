@@ -1432,3 +1432,698 @@ button:disabled {
     font-size: 27px;
   }
 }
+
+/* ================================================= */
+/* EMPLOYEE APPLICATION */
+/* ================================================= */
+
+.employee-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 15% 0%,
+      #ffffff 0%,
+      #f7f8fb 42%,
+      #f1f3f7 100%
+    );
+}
+
+
+/* ------------------------------------------------- */
+/* Employee header */
+/* ------------------------------------------------- */
+
+.employee-page .app-header {
+  min-height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 48px;
+
+  border-bottom: 1px solid #e4e8ef;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.94
+  );
+
+  backdrop-filter: blur(12px);
+
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.employee-page .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.employee-page .brand-mark {
+  width: 40px;
+  height: 40px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 11px;
+
+  background: #172033;
+  color: white;
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.employee-page .brand h1 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.employee-page .brand span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #8993a5;
+
+  font-size: 11px;
+}
+
+.employee-page .user-area {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.employee-page .user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.employee-page .user-info strong {
+  color: #172033;
+
+  font-size: 13px;
+}
+
+.employee-page .user-info span {
+  margin-top: 3px;
+
+  color: #8993a5;
+
+  font-size: 11px;
+}
+
+
+/* ------------------------------------------------- */
+/* Employee main */
+/* ------------------------------------------------- */
+
+.employee-page .employee-content {
+  width: min(
+    920px,
+    calc(100% - 40px)
+  );
+
+  margin: 0 auto;
+
+  padding: 72px 0 100px;
+}
+
+
+/* ------------------------------------------------- */
+/* Hero */
+/* ------------------------------------------------- */
+
+.employee-page .hero-section {
+  display: block;
+
+  margin: 0 auto 34px;
+
+  text-align: center;
+}
+
+.employee-page .hero-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 11px;
+
+  border: 1px solid #dfe4ec;
+  border-radius: 999px;
+
+  background: #eef1f6;
+  color: #626d80;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+}
+
+.employee-page .hero-section h2 {
+  margin: 18px 0 10px;
+
+  color: #172033;
+
+  font-size: clamp(
+    30px,
+    4vw,
+    46px
+  );
+
+  line-height: 1.08;
+
+  letter-spacing: -0.04em;
+}
+
+.employee-page .hero-section p {
+  max-width: 590px;
+
+  margin: 0 auto;
+
+  color: #748095;
+
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+
+/* ------------------------------------------------- */
+/* Question card */
+/* ------------------------------------------------- */
+
+.employee-page .question-card {
+  width: 100%;
+
+  padding: 28px;
+
+  border: 1px solid #e0e5ed;
+  border-radius: 18px;
+
+  background: white;
+
+  box-shadow:
+    0 20px 50px
+    rgba(
+      26,
+      39,
+      67,
+      0.08
+    );
+}
+
+.employee-page .question-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+
+/* ------------------------------------------------- */
+/* Labels */
+/* ------------------------------------------------- */
+
+.employee-page .field-label {
+  display: block;
+
+  margin: 0 0 9px;
+
+  color: #354158;
+
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.employee-page .question-label {
+  margin-top: 24px;
+}
+
+
+/* ------------------------------------------------- */
+/* Policy selector */
+/* ------------------------------------------------- */
+
+.employee-page .policy-select {
+  display: block;
+
+  width: 100%;
+
+  min-height: 48px;
+
+  padding: 0 14px;
+
+  border: 1px solid #dce2eb;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #fbfcfe;
+  color: #172033;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.employee-page .policy-select:hover {
+  background: white;
+}
+
+.employee-page .policy-select:focus {
+  border-color: #9ba5b6;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(
+      81,
+      96,
+      122,
+      0.08
+    );
+}
+
+
+/* ------------------------------------------------- */
+/* Question textarea */
+/* ------------------------------------------------- */
+
+.employee-page .question-input {
+  display: block;
+
+  width: 100%;
+
+  min-height: 150px;
+
+  padding: 15px;
+
+  resize: vertical;
+
+  border: 1px solid #dce2eb;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #fbfcfe;
+  color: #172033;
+
+  font-size: 14px;
+  line-height: 1.65;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.employee-page .question-input:focus {
+  border-color: #9ba5b6;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(
+      81,
+      96,
+      122,
+      0.08
+    );
+}
+
+.employee-page .question-input::placeholder {
+  color: #a0a9b8;
+}
+
+
+/* ------------------------------------------------- */
+/* Footer / Ask button */
+/* ------------------------------------------------- */
+
+.employee-page .question-footer {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-top: 14px;
+}
+
+.employee-page .input-hint {
+  color: #8993a5;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.employee-page .primary-button {
+  flex-shrink: 0;
+
+  min-height: 43px;
+
+  padding: 10px 18px;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: #172033;
+  color: white;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  box-shadow:
+    0 6px 15px
+    rgba(
+      23,
+      32,
+      51,
+      0.14
+    );
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.employee-page .primary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 22px
+    rgba(
+      23,
+      32,
+      51,
+      0.18
+    );
+}
+
+
+/* ------------------------------------------------- */
+/* Loading / empty */
+/* ------------------------------------------------- */
+
+.employee-page .loading-box,
+.employee-page .empty-box {
+  width: 100%;
+
+  padding: 18px;
+
+  border: 1px dashed #d5dce7;
+  border-radius: 10px;
+
+  background: #fafbfd;
+}
+
+.employee-page .empty-box strong {
+  display: block;
+
+  color: #354158;
+
+  font-size: 13px;
+}
+
+.employee-page .empty-box p {
+  margin: 6px 0 0;
+
+  color: #7d889b;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ------------------------------------------------- */
+/* Error */
+/* ------------------------------------------------- */
+
+.employee-page .error-card {
+  margin-top: 20px;
+
+  padding: 16px 18px;
+
+  border: 1px solid #ead8d8;
+  border-radius: 11px;
+
+  background: #fffafa;
+}
+
+.employee-page .error-card strong {
+  display: block;
+
+  color: #884848;
+
+  font-size: 12px;
+}
+
+.employee-page .error-card p {
+  margin: 5px 0 0;
+
+  color: #9a5b5b;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ------------------------------------------------- */
+/* Answer */
+/* ------------------------------------------------- */
+
+.employee-page .answer-section {
+  margin-top: 48px;
+}
+
+.employee-page .section-heading {
+  margin-bottom: 15px;
+}
+
+.employee-page .section-kicker {
+  display: block;
+
+  color: #8a94a6;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+}
+
+.employee-page .section-heading h3 {
+  margin: 5px 0 0;
+
+  color: #172033;
+
+  font-size: 21px;
+}
+
+.employee-page .answer-card {
+  padding: 28px;
+
+  border-radius: 15px;
+
+  background: #172033;
+  color: white;
+
+  box-shadow:
+    0 16px 35px
+    rgba(
+      23,
+      32,
+      51,
+      0.15
+    );
+}
+
+.employee-page .answer-text {
+  margin: 0;
+
+  color: white;
+
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+
+/* ------------------------------------------------- */
+/* Sources */
+/* ------------------------------------------------- */
+
+.employee-page .sources-header {
+  margin-top: 34px;
+}
+
+.employee-page .sources-header h3 {
+  margin: 5px 0 0;
+
+  color: #172033;
+
+  font-size: 21px;
+}
+
+.employee-page .sources-list {
+  display: grid;
+
+  gap: 12px;
+
+  margin-top: 15px;
+}
+
+.employee-page .source-card {
+  width: 100%;
+
+  padding: 19px;
+
+  border: 1px solid #e1e5ec;
+  border-radius: 13px;
+
+  background: white;
+
+  box-shadow:
+    0 4px 12px
+    rgba(
+      25,
+      38,
+      62,
+      0.03
+    );
+}
+
+.employee-page .source-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 18px;
+}
+
+.employee-page .source-top strong {
+  display: block;
+
+  color: #263149;
+
+  font-size: 13px;
+}
+
+.employee-page .source-top > div > span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #8a94a6;
+
+  font-size: 11px;
+}
+
+.employee-page .source-badge {
+  flex-shrink: 0;
+
+  padding: 5px 8px;
+
+  border-radius: 999px;
+
+  background: #eef1f6;
+  color: #687389;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 0.04em;
+}
+
+.employee-page .source-card > p {
+  margin: 14px 0 0;
+
+  color: #536075;
+
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+
+/* ------------------------------------------------- */
+/* Employee mobile */
+/* ------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .employee-page .app-header {
+    padding: 0 17px;
+  }
+
+  .employee-page .brand span {
+    display: none;
+  }
+
+  .employee-page .user-info {
+    display: none;
+  }
+
+  .employee-page .employee-content {
+    width: calc(100% - 24px);
+
+    padding-top: 48px;
+    padding-bottom: 70px;
+  }
+
+  .employee-page .hero-section h2 {
+    font-size: 31px;
+  }
+
+  .employee-page .hero-section p {
+    font-size: 14px;
+  }
+
+  .employee-page .question-card {
+    padding: 20px;
+
+    border-radius: 14px;
+  }
+
+  .employee-page .question-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .employee-page .input-hint {
+    display: none;
+  }
+
+  .employee-page .primary-button {
+    width: 100%;
+  }
+
+  .employee-page .answer-card {
+    padding: 21px;
+  }
+
+  .employee-page .answer-text {
+    font-size: 15px;
+  }
+
+  .employee-page .source-top {
+    flex-direction: column;
+  }
+}

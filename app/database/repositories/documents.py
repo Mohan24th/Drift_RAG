@@ -171,6 +171,30 @@ class DocumentRepository:
 
         return latest.version_number + 1
 
+    def get_approved_versions(
+        self,
+        document_id: str,
+    ) -> list[DocumentVersionModel]:
+
+        statement = (
+            select(DocumentVersionModel)
+            .where(
+                DocumentVersionModel.document_id
+                == document_id,
+                DocumentVersionModel.status
+                == "APPROVED",
+            )
+            .order_by(
+                DocumentVersionModel.version_number.desc()
+            )
+        )
+
+        return list(
+            self.session.execute(
+                statement
+            ).scalars().all()
+        )
+
     def get_latest_approved_version(
         self,
         document_id: str,

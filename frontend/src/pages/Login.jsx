@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import {
   Navigate,
@@ -15,7 +18,13 @@ export default function Login() {
     user,
   } = useAuth();
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
+
+
+  // --------------------------------------------------
+  // Form state
+  // --------------------------------------------------
 
   const [
     username,
@@ -38,6 +47,32 @@ export default function Login() {
   ] = useState(false);
 
 
+  // --------------------------------------------------
+  // Session-expired state
+  // --------------------------------------------------
+
+  const [
+    expired,
+    setExpired,
+  ] = useState(false);
+
+
+  useEffect(() => {
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    setExpired(
+      params.get("expired") === "1"
+    );
+  }, []);
+
+
+  // --------------------------------------------------
+  // Already authenticated
+  // --------------------------------------------------
+
   if (isAuthenticated) {
     if (
       user?.role === "EMPLOYEE"
@@ -58,6 +93,10 @@ export default function Login() {
     );
   }
 
+
+  // --------------------------------------------------
+  // Submit login
+  // --------------------------------------------------
 
   async function handleSubmit(
     event
@@ -84,12 +123,21 @@ export default function Login() {
             replace: true,
           }
         );
-      } else {
+      } else if (
+        loggedInUser.role ===
+          "HR" ||
+        loggedInUser.role ===
+          "ADMIN"
+      ) {
         navigate(
           "/admin",
           {
             replace: true,
           }
+        );
+      } else {
+        setError(
+          "Your account has an unsupported role."
         );
       }
 
@@ -103,6 +151,10 @@ export default function Login() {
     }
   }
 
+
+  // --------------------------------------------------
+  // UI
+  // --------------------------------------------------
 
   return (
     <div className="login-page">
@@ -156,6 +208,28 @@ export default function Login() {
           </div>
 
 
+          {/* -------------------------------------- */}
+          {/* Session expired */}
+          {/* -------------------------------------- */}
+
+          {expired && (
+            <div className="login-error">
+              <strong>
+                Session expired
+              </strong>
+
+              <span>
+                Your session has expired.
+                Please sign in again.
+              </span>
+            </div>
+          )}
+
+
+          {/* -------------------------------------- */}
+          {/* Login form */}
+          {/* -------------------------------------- */}
+
           <form
             className="login-form"
             onSubmit={
@@ -184,6 +258,7 @@ export default function Login() {
                 autoComplete="username"
                 autoFocus
                 required
+                disabled={loading}
               />
             </label>
 
@@ -208,9 +283,14 @@ export default function Login() {
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 required
+                disabled={loading}
               />
             </label>
 
+
+            {/* ------------------------------------ */}
+            {/* Login error */}
+            {/* ------------------------------------ */}
 
             {error && (
               <div className="login-error">
@@ -228,7 +308,11 @@ export default function Login() {
             <button
               type="submit"
               className="login-button"
-              disabled={loading}
+              disabled={
+                loading ||
+                !username.trim() ||
+                !password
+              }
             >
               {loading
                 ? "Signing in..."
@@ -237,6 +321,10 @@ export default function Login() {
 
           </form>
 
+
+          {/* -------------------------------------- */}
+          {/* Security message */}
+          {/* -------------------------------------- */}
 
           <div className="login-footer">
             <span>

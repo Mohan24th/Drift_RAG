@@ -21,6 +21,6 @@ def get_document_storage() -> DocumentStorage:
         )
 
     raise RuntimeError(
-        "Unsupported document storage: "
+        f"Unsupported document storage: "
         f"{settings.document_storage}"
     )

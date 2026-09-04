@@ -54,7 +54,13 @@ export default function EmployeeApp() {
   ] = useState("");
 
 
+  // --------------------------------------------------
+  // Load approved documents
+  // --------------------------------------------------
+
   useEffect(() => {
+    let cancelled = false;
+
     async function loadDocuments() {
       setLoadingDocuments(true);
       setError("");
@@ -65,49 +71,75 @@ export default function EmployeeApp() {
             token
           );
 
-        setDocuments(data);
+        if (cancelled) {
+          return;
+        }
+
+        setDocuments(
+          Array.isArray(data)
+            ? data
+            : []
+        );
 
         if (
+          Array.isArray(data) &&
           data.length > 0
         ) {
           setSelectedDocumentId(
             data[0].id
           );
+        } else {
+          setSelectedDocumentId("");
         }
+
       } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
         setError(
           err.message ||
             "Unable to load company policies."
         );
       } finally {
-        setLoadingDocuments(
-          false
-        );
+        if (!cancelled) {
+          setLoadingDocuments(
+            false
+          );
+        }
       }
     }
 
-    loadDocuments();
+    if (token) {
+      loadDocuments();
+    }
+
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
+
+  // --------------------------------------------------
+  // Ask question
+  // --------------------------------------------------
 
   async function handleAsk(
     event
   ) {
     event.preventDefault();
 
-    const trimmed =
+    const trimmedQuestion =
       question.trim();
 
-    if (!trimmed) {
+    if (!trimmedQuestion) {
       setError(
         "Please enter a question."
       );
       return;
     }
 
-    if (
-      !selectedDocumentId
-    ) {
+    if (!selectedDocumentId) {
       setError(
         "Please select a policy."
       );
@@ -122,12 +154,13 @@ export default function EmployeeApp() {
       const data =
         await queryDocument(
           selectedDocumentId,
-          trimmed,
+          trimmedQuestion,
           3,
           token
         );
 
       setResult(data);
+
     } catch (err) {
       setError(
         err.message ||
@@ -141,6 +174,10 @@ export default function EmployeeApp() {
   }
 
 
+  // --------------------------------------------------
+  // Change selected policy
+  // --------------------------------------------------
+
   function handleDocumentChange(
     event
   ) {
@@ -148,6 +185,7 @@ export default function EmployeeApp() {
       event.target.value
     );
 
+    setQuestion("");
     setResult(null);
     setError("");
   }
@@ -156,13 +194,14 @@ export default function EmployeeApp() {
   return (
     <div className="employee-page">
 
-      {/* --------------------------------------------- */}
-      {/* Top navigation */}
-      {/* --------------------------------------------- */}
+      {/* ============================================== */}
+      {/* Header */}
+      {/* ============================================== */}
 
       <header className="app-header">
 
         <div className="brand">
+
           <div className="brand-mark">
             DR
           </div>
@@ -176,13 +215,15 @@ export default function EmployeeApp() {
               Company Knowledge Assistant
             </span>
           </div>
+
         </div>
 
 
         <div className="user-area">
+
           <div className="user-info">
             <strong>
-              {user.username}
+              {user?.username}
             </strong>
 
             <span>
@@ -197,16 +238,21 @@ export default function EmployeeApp() {
           >
             Sign out
           </button>
+
         </div>
 
       </header>
 
 
-      {/* --------------------------------------------- */}
-      {/* Main content */}
-      {/* --------------------------------------------- */}
+      {/* ============================================== */}
+      {/* Main */}
+      {/* ============================================== */}
 
       <main className="employee-content">
+
+        {/* -------------------------------------------- */}
+        {/* Hero */}
+        {/* -------------------------------------------- */}
 
         <section className="hero-section">
 
@@ -226,9 +272,9 @@ export default function EmployeeApp() {
         </section>
 
 
-        {/* ------------------------------------------- */}
+        {/* -------------------------------------------- */}
         {/* Question card */}
-        {/* ------------------------------------------- */}
+        {/* -------------------------------------------- */}
 
         <section className="question-card">
 
@@ -244,20 +290,24 @@ export default function EmployeeApp() {
               Policy
             </label>
 
+
             {loadingDocuments ? (
               <div className="loading-box">
-                Loading policies...
+                Loading approved policies...
               </div>
             ) : documents.length === 0 ? (
               <div className="empty-box">
+
                 <strong>
-                  No approved policies
+                  No approved policies available
                 </strong>
 
                 <p>
                   There are currently no
-                  approved documents available.
+                  approved company documents
+                  available for questions.
                 </p>
+
               </div>
             ) : (
               <select
@@ -267,6 +317,9 @@ export default function EmployeeApp() {
                 }
                 onChange={
                   handleDocumentChange
+                }
+                disabled={
+                  loadingAnswer
                 }
               >
                 {documents.map(
@@ -293,6 +346,7 @@ export default function EmployeeApp() {
               Your question
             </label>
 
+
             <textarea
               className="question-input"
               value={
@@ -318,8 +372,8 @@ export default function EmployeeApp() {
             <div className="question-footer">
 
               <span className="input-hint">
-                Ask a clear question about
-                the selected policy.
+                Answers are based on
+                approved company policies.
               </span>
 
               <button
@@ -333,7 +387,7 @@ export default function EmployeeApp() {
                 }
               >
                 {loadingAnswer
-                  ? "Thinking..."
+                  ? "Finding answer..."
                   : "Ask question"}
               </button>
 
@@ -344,12 +398,13 @@ export default function EmployeeApp() {
         </section>
 
 
-        {/* ------------------------------------------- */}
+        {/* -------------------------------------------- */}
         {/* Error */}
-        {/* ------------------------------------------- */}
+        {/* -------------------------------------------- */}
 
         {error && (
           <section className="error-card">
+
             <strong>
               Something went wrong
             </strong>
@@ -357,27 +412,28 @@ export default function EmployeeApp() {
             <p>
               {error}
             </p>
+
           </section>
         )}
 
 
-        {/* ------------------------------------------- */}
-        {/* Answer */}
-        {/* ------------------------------------------- */}
+        {/* -------------------------------------------- */}
+        {/* Result */}
+        {/* -------------------------------------------- */}
 
         {result && (
           <section className="answer-section">
 
             <div className="section-heading">
-              <div>
-                <span className="section-kicker">
-                  RESPONSE
-                </span>
 
-                <h3>
-                  Answer
-                </h3>
-              </div>
+              <span className="section-kicker">
+                RESPONSE
+              </span>
+
+              <h3>
+                Answer
+              </h3>
+
             </div>
 
 
@@ -390,68 +446,75 @@ export default function EmployeeApp() {
             </div>
 
 
-            {/* --------------------------------------- */}
+            {/* ---------------------------------------- */}
             {/* Sources */}
-            {/* --------------------------------------- */}
+            {/* ---------------------------------------- */}
 
             <div className="sources-header">
+
               <span className="section-kicker">
                 SOURCES
               </span>
 
               <h3>
-                Based on
+                Based on these policy sections
               </h3>
+
             </div>
 
 
             <div className="sources-list">
 
-              {result.sources.map(
-                (
-                  source,
-                  index
-                ) => (
-                  <article
-                    className="source-card"
-                    key={
-                      `${source.version_number}-${source.chunk_index}-${index}`
-                    }
-                  >
+              {Array.isArray(
+                result.sources
+              ) &&
+                result.sources.map(
+                  (
+                    source,
+                    index
+                  ) => (
+                    <article
+                      className="source-card"
+                      key={
+                        `${source.document_name}-${source.version_number}-${source.chunk_index}-${index}`
+                      }
+                    >
 
-                    <div className="source-top">
+                      <div className="source-top">
 
-                      <div>
-                        <strong>
-                          {
-                            source.document_name
-                          }
-                        </strong>
+                        <div>
 
-                        <span>
-                          Version v
-                          {
-                            source.version_number
-                          }
+                          <strong>
+                            {
+                              source.document_name
+                            }
+                          </strong>
+
+                          <span>
+                            Version v
+                            {
+                              source.version_number
+                            }
+                          </span>
+
+                        </div>
+
+                        <span className="source-badge">
+                          Source
                         </span>
+
                       </div>
 
-                      <span className="source-badge">
-                        Source
-                      </span>
 
-                    </div>
+                      <p>
+                        {
+                          source.text
+                        }
+                      </p>
 
-
-                    <p>
-                      {
-                        source.text
-                      }
-                    </p>
-
-                  </article>
-                )
-              )}
+                    </article>
+                  )
+                )}
 
             </div>
 

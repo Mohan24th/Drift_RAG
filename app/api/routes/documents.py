@@ -176,7 +176,8 @@ def list_documents(
 
 
 # --------------------------------------------------
-# List documents available to employees
+# List available documents
+# Authenticated users
 # Only documents with an APPROVED version
 # --------------------------------------------------
 
@@ -517,6 +518,7 @@ def approve_document_version(
             ),
         )
 
+    # Idempotent approval.
     if version.status == "APPROVED":
         return VersionResponse(
             document_id=document_id,
@@ -527,6 +529,19 @@ def approve_document_version(
             ),
         )
 
+    # Archive every other currently approved
+    # version for this document.
+    approved_versions = (
+        repository.get_approved_versions(
+            document_id
+        )
+    )
+
+    for approved_version in approved_versions:
+        if approved_version.id != version.id:
+            approved_version.status = "ARCHIVED"
+
+    # Approve the selected version.
     version.status = "APPROVED"
     version.approved_at = datetime.utcnow()
 
