@@ -1,8 +1,4 @@
-Yep. Your current README is outdated now because the project has moved far beyond the original FAISS-only description.
 
-Replace the entire root `README.md` with this:
-
-````markdown
 # Drift RAG
 
 Drift RAG is a version-aware Retrieval-Augmented Generation (RAG) platform
