@@ -1,0 +1,554 @@
+[
+  {
+    "query_id": "Q1",
+    "question": "What personal data can the company collect about employees?",
+    "version_number": 1,
+    "version_id": "7f9dc295-cb58-4a3c-aa72-aa050ad67839",
+    "latency_ms": 2857.89,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 69,
+        "score": 0.733865,
+        "text": "data collected, maintained or used outside of the employment relationship, such as personal \ndata"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 285,
+        "score": 0.713569,
+        "text": "personal data because it is necessary to do so to implement \nan employment agreement between you"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 44,
+        "score": 0.71282,
+        "text": "applies to all personal data about past, present, temporary and permanent employees, \ncontractors,"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 14,
+        "score": 0.703251,
+        "text": "s regulate the collection and use of personal data relating to \nemployees. This Human Resources"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 105,
+        "score": 0.691601,
+        "text": "ith your personal data as part of their job responsibility to treat it as \nconfidential and in"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.6,
+      "recall_at_5": 1.0,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.7328
+    }
+  },
+  {
+    "query_id": "Q1",
+    "question": "What personal data can the company collect about employees?",
+    "version_number": 2,
+    "version_id": "7986525b-667e-4a80-8c8a-918125ba03f0",
+    "latency_ms": 143.68,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 76,
+        "score": 0.733865,
+        "text": "data collected, maintained or used outside of the employment relationship, such as personal \ndata"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 379,
+        "score": 0.713569,
+        "text": "personal data because it is necessary to do so to implement \nan employment agreement between you"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 51,
+        "score": 0.71282,
+        "text": "applies to all personal data about past, present, temporary and permanent employees, \ncontractors,"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 21,
+        "score": 0.703251,
+        "text": "s regulate the collection and use of personal data relating to \nemployees. This Human Resources"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 112,
+        "score": 0.691601,
+        "text": "ith your personal data as part of their job responsibility to treat it as \nconfidential and in"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.6,
+      "recall_at_5": 1.0,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.7328
+    }
+  },
+  {
+    "query_id": "Q2",
+    "question": "What rules apply to using AI tools at work?",
+    "version_number": 1,
+    "version_id": "7f9dc295-cb58-4a3c-aa72-aa050ad67839",
+    "latency_ms": 143.09,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 354,
+        "score": 0.573008,
+        "text": "e to you, including tools and platforms powered by Artificial Intelligence (AI), for \nemployment"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 179,
+        "score": 0.521724,
+        "text": "d by Artificial Intelligence \n(AI),,subject to relevant restrictions under applicable law \n4.1.6."
+      },
+      {
+        "rank": 3,
+        "chunk_index": 177,
+        "score": 0.51329,
+        "text": "interactions with tools and platforms powered by Artificial Intelligence \n(AI),,subject to relevant"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 356,
+        "score": 0.505789,
+        "text": "d by Artificial Intelligence (AI), for \nemployment related purposes, which may contain personal"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 353,
+        "score": 0.466079,
+        "text": "ister and make \navailable to you, including tools and platforms powered by Artificial Intelligence"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.8,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0
+    }
+  },
+  {
+    "query_id": "Q2",
+    "question": "What rules apply to using AI tools at work?",
+    "version_number": 2,
+    "version_id": "7986525b-667e-4a80-8c8a-918125ba03f0",
+    "latency_ms": 142.23,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 730,
+        "score": 0.61001,
+        "text": "ed AI-enabled tools may process company documents or communications for an authorised work purpose."
+      },
+      {
+        "rank": 2,
+        "chunk_index": 549,
+        "score": 0.573008,
+        "text": "e to you, including tools and platforms powered by Artificial Intelligence (AI), for \nemployment"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 471,
+        "score": 0.57263,
+        "text": "stems and\napproved AI tools, subject to applicable law.\n4.1.6.   Sensitive information, such as"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 742,
+        "score": 0.557768,
+        "text": "or AI-assisted HR workflows, a designated human decision-maker must review consequential"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 741,
+        "score": 0.551185,
+        "text": ".\n6.1.2.   For AI-assisted HR workflows, a designated human decision-maker must review"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0
+    }
+  },
+  {
+    "query_id": "Q3",
+    "question": "How does the company handle third-party service providers and international data transfers?",
+    "version_number": 1,
+    "version_id": "7f9dc295-cb58-4a3c-aa72-aa050ad67839",
+    "latency_ms": 144.5,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 529,
+        "score": 0.708353,
+        "text": "d third-party service providers operate, worldwide, depending on the needs of the business \nover"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 527,
+        "score": 0.682519,
+        "text": "other jurisdiction where we or our \napproved third-party service providers operate, worldwide,"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 528,
+        "score": 0.666429,
+        "text": "here we or our \napproved third-party service providers operate, worldwide, depending on the needs"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 558,
+        "score": 0.661566,
+        "text": ") where a third-party service provider retained by us is under contract to assist in \nadministering"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 530,
+        "score": 0.619794,
+        "text": "providers operate, worldwide, depending on the needs of the business \nover the course of your"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0
+    }
+  },
+  {
+    "query_id": "Q3",
+    "question": "How does the company handle third-party service providers and international data transfers?",
+    "version_number": 2,
+    "version_id": "7986525b-667e-4a80-8c8a-918125ba03f0",
+    "latency_ms": 260.87,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 827,
+        "score": 0.708353,
+        "text": "d third-party service providers operate, worldwide, depending on the needs of the business \nover"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 825,
+        "score": 0.682519,
+        "text": "other jurisdiction where we or our \napproved third-party service providers operate, worldwide,"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 826,
+        "score": 0.666429,
+        "text": "here we or our \napproved third-party service providers operate, worldwide, depending on the needs"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 856,
+        "score": 0.661566,
+        "text": ") where a third-party service provider retained by us is under contract to assist in \nadministering"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 828,
+        "score": 0.619794,
+        "text": "providers operate, worldwide, depending on the needs of the business \nover the course of your"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0
+    }
+  },
+  {
+    "query_id": "Q4",
+    "question": "What rights do employees have to access, correct, or erase personal data?",
+    "version_number": 1,
+    "version_id": "7f9dc295-cb58-4a3c-aa72-aa050ad67839",
+    "latency_ms": 145.15,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 105,
+        "score": 0.686811,
+        "text": "ith your personal data as part of their job responsibility to treat it as \nconfidential and in"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 597,
+        "score": 0.65492,
+        "text": ". \nSUBJECT ACCESS: You have the right to access your personal data in many circumstances, generally"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 129,
+        "score": 0.627598,
+        "text": "bound to maintain confidentiality when \nhandling your personal data on our behalf, in a manner that"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 598,
+        "score": 0.617751,
+        "text": "ve the right to access your personal data in many circumstances, generally \nwithin 1 month of your"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 596,
+        "score": 0.617606,
+        "text": "SUBJECT RIGHTS? \n \n8.1. \nSUBJECT ACCESS: You have the right to access your personal data in many"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.6,
+      "recall_at_5": 1.0,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6797
+    }
+  },
+  {
+    "query_id": "Q4",
+    "question": "What rights do employees have to access, correct, or erase personal data?",
+    "version_number": 2,
+    "version_id": "7986525b-667e-4a80-8c8a-918125ba03f0",
+    "latency_ms": 141.72,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 990,
+        "score": 0.723294,
+        "text": "8. DATA SUBJECT RIGHTS\n8.1 ACCESS.   Workers may request access to their personal data through the"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 112,
+        "score": 0.686811,
+        "text": "ith your personal data as part of their job responsibility to treat it as \nconfidential and in"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 895,
+        "score": 0.65492,
+        "text": ". \nSUBJECT ACCESS: You have the right to access your personal data in many circumstances, generally"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 989,
+        "score": 0.65096,
+        "text": "of records that contain \n8. DATA SUBJECT RIGHTS\n8.1 ACCESS.   Workers may request access to their"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 991,
+        "score": 0.637839,
+        "text": ".1 ACCESS.   Workers may request access to their personal data through the Data Protection Office."
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.8,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.9047
+    }
+  },
+  {
+    "query_id": "Q5",
+    "question": "What security measures protect employee personal data?",
+    "version_number": 1,
+    "version_id": "7f9dc295-cb58-4a3c-aa72-aa050ad67839",
+    "latency_ms": 163.91,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 653,
+        "score": 0.760839,
+        "text": "appropriate administrative, technical, personnel and physical measures to safeguard personal \ndata"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 654,
+        "score": 0.739491,
+        "text": "ve, technical, personnel and physical measures to safeguard personal \ndata against loss, theft, and"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 655,
+        "score": 0.715696,
+        "text": "and physical measures to safeguard personal \ndata against loss, theft, and unauthorized uses or"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 105,
+        "score": 0.711597,
+        "text": "ith your personal data as part of their job responsibility to treat it as \nconfidential and in"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 89,
+        "score": 0.676644,
+        "text": "alue our employees and appreciate the importance of treating personal data as confidential. \n3.2."
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.6,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0
+    }
+  },
+  {
+    "query_id": "Q5",
+    "question": "What security measures protect employee personal data?",
+    "version_number": 2,
+    "version_id": "7986525b-667e-4a80-8c8a-918125ba03f0",
+    "latency_ms": 134.08,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 951,
+        "score": 0.760839,
+        "text": "appropriate administrative, technical, personnel and physical measures to safeguard personal \ndata"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 952,
+        "score": 0.739491,
+        "text": "ve, technical, personnel and physical measures to safeguard personal \ndata against loss, theft, and"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 953,
+        "score": 0.715696,
+        "text": "and physical measures to safeguard personal \ndata against loss, theft, and unauthorized uses or"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 112,
+        "score": 0.711597,
+        "text": "ith your personal data as part of their job responsibility to treat it as \nconfidential and in"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 96,
+        "score": 0.676644,
+        "text": "alue our employees and appreciate the importance of treating personal data as confidential. \n3.2."
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.6,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0
+    }
+  },
+  {
+    "query_id": "Q6",
+    "question": "What are the rules for sharing confidential company information?",
+    "version_number": 1,
+    "version_id": "7f9dc295-cb58-4a3c-aa72-aa050ad67839",
+    "latency_ms": 133.9,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 576,
+        "score": 0.618302,
+        "text": "only subject to contractual requirements to preserve confidentiality; (3) with private or"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 577,
+        "score": 0.61658,
+        "text": "contractual requirements to preserve confidentiality; (3) with private or \ngovernment authorities"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 128,
+        "score": 0.60972,
+        "text": "Section 6 below, are bound to maintain confidentiality when \nhandling your personal data on our"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 368,
+        "score": 0.599614,
+        "text": "cluding disclosure to other Group companies and \nto others such as payroll providers, accountants,"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 31,
+        "score": 0.593073,
+        "text": "permitted and should be communicated by the relevant Group company to its employees, as required"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.6,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.9675
+    }
+  },
+  {
+    "query_id": "Q6",
+    "question": "What are the rules for sharing confidential company information?",
+    "version_number": 2,
+    "version_id": "7986525b-667e-4a80-8c8a-918125ba03f0",
+    "latency_ms": 134.66,
+    "retrieved_chunks": [
+      {
+        "rank": 1,
+        "chunk_index": 874,
+        "score": 0.618302,
+        "text": "only subject to contractual requirements to preserve confidentiality; (3) with private or"
+      },
+      {
+        "rank": 2,
+        "chunk_index": 875,
+        "score": 0.61658,
+        "text": "contractual requirements to preserve confidentiality; (3) with private or \ngovernment authorities"
+      },
+      {
+        "rank": 3,
+        "chunk_index": 135,
+        "score": 0.60972,
+        "text": "Section 6 below, are bound to maintain confidentiality when \nhandling your personal data on our"
+      },
+      {
+        "rank": 4,
+        "chunk_index": 563,
+        "score": 0.599614,
+        "text": "cluding disclosure to other Group companies and \nto others such as payroll providers, accountants,"
+      },
+      {
+        "rank": 5,
+        "chunk_index": 38,
+        "score": 0.593073,
+        "text": "permitted and should be communicated by the relevant Group company to its employees, as required"
+      }
+    ],
+    "labels_complete": true,
+    "metrics": {
+      "precision_at_5": 0.6,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.9675
+    }
+  }
+]

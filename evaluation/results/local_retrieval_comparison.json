@@ -1,0 +1,520 @@
+{
+  "note": "Local exploratory retrieval comparison. PDFs are searched together. These rankings are not directly comparable to Supabase results, and accuracy metrics require relevance labels for these local chunks.",
+  "documents": [
+    "company_policy.pdf",
+    "company_policy_2.pdf",
+    "company_policy_3.pdf",
+    "company_policy_4.pdf",
+    "company_policy_5.pdf",
+    "human_rights.pdf"
+  ],
+  "top_k": 5,
+  "results": {
+    "100": {
+      "overlap": 20,
+      "chunk_count": 50,
+      "retrieval_scoring_ms_all_queries": 0.5,
+      "queries": [
+        {
+          "query_id": "Q1",
+          "question": "What personal data can the company collect about employees?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 12,
+              "score": 0.49974,
+              "text": "g to company policy and applicable employment \nrequirements.\nEmployees should notify their manager"
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.48744,
+              "text": "Employees must be treated fairly regardless of their personal background, identity, or \nindividual"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 10,
+              "score": 0.47405,
+              "text": "romotion, training, or other workplace activities. 5. \nReporting Concerns Employees who experience"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 12,
+              "score": 0.45678,
+              "text": "port the concern to their manager, HR, or another authorized \ncompany representative. 6."
+            },
+            {
+              "rank": 5,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.43017,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated"
+            }
+          ]
+        },
+        {
+          "query_id": "Q2",
+          "question": "What rules apply to using AI tools at work?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 3,
+              "score": 0.33429,
+              "text": "ity, or \nindividual characteristics. Employment decisions should be based on qualifications,"
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 5,
+              "score": 0.30676,
+              "text": "ies. 3. Respectful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 4,
+              "score": 0.30347,
+              "text": "on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 6,
+              "score": 0.29839,
+              "text": "busive behavior are not \npermitted in the workplace. Employees are expected to communicate"
+            },
+            {
+              "rank": 5,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.28996,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated"
+            }
+          ]
+        },
+        {
+          "query_id": "Q3",
+          "question": "How does the company handle third-party service providers and international data transfers?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 12,
+              "score": 0.36643,
+              "text": "port the concern to their manager, HR, or another authorized \ncompany representative. 6."
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 8,
+              "score": 0.30616,
+              "text": "ers, customers, and business partners. 4. \nDiscrimination The company does not tolerate unlawful"
+            },
+            {
+              "rank": 3,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 4,
+              "score": 0.28885,
+              "text": "be reported to the manager as soon as reasonably possible.\n3. Carry Forward\nEmployees may carry"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 4,
+              "score": 0.26693,
+              "text": "on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful"
+            },
+            {
+              "rank": 5,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.22016,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated"
+            }
+          ]
+        },
+        {
+          "query_id": "Q4",
+          "question": "What rights do employees have to access, correct, or erase personal data?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.51735,
+              "text": "Employees must be treated fairly regardless of their personal background, identity, or \nindividual"
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 13,
+              "score": 0.43734,
+              "text": "representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 12,
+              "score": 0.42549,
+              "text": "port the concern to their manager, HR, or another authorized \ncompany representative. 6."
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 17,
+              "score": 0.39248,
+              "text": "olicy Version This \ndocument is Human Rights and Respectful Workplace Policy Version 1. EOF"
+            },
+            {
+              "rank": 5,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 12,
+              "score": 0.35996,
+              "text": "g to company policy and applicable employment \nrequirements.\nEmployees should notify their manager"
+            }
+          ]
+        },
+        {
+          "query_id": "Q5",
+          "question": "What security measures protect employee personal data?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.53415,
+              "text": "Employees must be treated fairly regardless of their personal background, identity, or \nindividual"
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 10,
+              "score": 0.463,
+              "text": "romotion, training, or other workplace activities. 5. \nReporting Concerns Employees who experience"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 12,
+              "score": 0.44331,
+              "text": "port the concern to their manager, HR, or another authorized \ncompany representative. 6."
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.43929,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated"
+            },
+            {
+              "rank": 5,
+              "file": "human_rights.pdf",
+              "chunk_index": 13,
+              "score": 0.41258,
+              "text": "representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people"
+            }
+          ]
+        },
+        {
+          "query_id": "Q6",
+          "question": "What are the rules for sharing confidential company information?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 13,
+              "score": 0.54245,
+              "text": "representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people"
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 12,
+              "score": 0.45634,
+              "text": "port the concern to their manager, HR, or another authorized \ncompany representative. 6."
+            },
+            {
+              "rank": 3,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 12,
+              "score": 0.43309,
+              "text": "g to company policy and applicable employment \nrequirements.\nEmployees should notify their manager"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 4,
+              "score": 0.4119,
+              "text": "on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful"
+            },
+            {
+              "rank": 5,
+              "file": "human_rights.pdf",
+              "chunk_index": 8,
+              "score": 0.39276,
+              "text": "ers, customers, and business partners. 4. \nDiscrimination The company does not tolerate unlawful"
+            }
+          ]
+        }
+      ]
+    },
+    "500": {
+      "overlap": 100,
+      "chunk_count": 11,
+      "retrieval_scoring_ms_all_queries": 0.03,
+      "queries": [
+        {
+          "query_id": "Q1",
+          "question": "What personal data can the company collect about employees?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.43151,
+              "text": "workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may violate \nthis policy should report the concern to their manager, HR, or another authorized \ncompany representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people who need the information to review or respond to the \nconcern. 7. No Retaliation Employees who raise a concern in good faith or participate \nin an investigation should not be subject to retaliation."
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.33978,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated with dignity, fairness, and respect. 2. Equal Treatment \nEmployees must be treated fairly regardless of their personal background, identity, or \nindividual characteristics. Employment decisions should be based on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 1,
+              "score": 0.32066,
+              "text": "ful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted in the workplace. Employees are expected to communicate professionally \nand respectfully with colleagues, managers, customers, and business partners. 4. \nDiscrimination The company does not tolerate unlawful discrimination in recruitment, \nemployment, compensation, promotion, training, or other workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may"
+            },
+            {
+              "rank": 4,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 2,
+              "score": 0.23892,
+              "text": "ys are separate from annual leave and are not deducted from an \nemployee's annual leave balance.\n6. Sick Leave\nSick leave is available according to company policy and applicable employment \nrequirements.\nEmployees should notify their manager as soon as possible when taking sick leave.\n7. Policy Version\nThis document is Company Leave Policy Version 5 and replaces the previous version \nof the leave policy.\nEOF"
+            },
+            {
+              "rank": 5,
+              "file": "human_rights.pdf",
+              "chunk_index": 3,
+              "score": 0.22645,
+              "text": "e a concern in good faith or participate \nin an investigation should not be subject to retaliation. 8. Policy Version This \ndocument is Human Rights and Respectful Workplace Policy Version 1. EOF"
+            }
+          ]
+        },
+        {
+          "query_id": "Q2",
+          "question": "What rules apply to using AI tools at work?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.26916,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated with dignity, fairness, and respect. 2. Equal Treatment \nEmployees must be treated fairly regardless of their personal background, identity, or \nindividual characteristics. Employment decisions should be based on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted"
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 1,
+              "score": 0.26552,
+              "text": "ful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted in the workplace. Employees are expected to communicate professionally \nand respectfully with colleagues, managers, customers, and business partners. 4. \nDiscrimination The company does not tolerate unlawful discrimination in recruitment, \nemployment, compensation, promotion, training, or other workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 3,
+              "score": 0.21972,
+              "text": "e a concern in good faith or participate \nin an investigation should not be subject to retaliation. 8. Policy Version This \ndocument is Human Rights and Respectful Workplace Policy Version 1. EOF"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.21541,
+              "text": "workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may violate \nthis policy should report the concern to their manager, HR, or another authorized \ncompany representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people who need the information to review or respond to the \nconcern. 7. No Retaliation Employees who raise a concern in good faith or participate \nin an investigation should not be subject to retaliation."
+            },
+            {
+              "rank": 5,
+              "file": "company_policy.pdf",
+              "chunk_index": 0,
+              "score": 0.15966,
+              "text": "Company Leave Policy\nEmployees receive 20 days of annual leave every calendar year.\nEmployees should submit leave requests at least 3 days before the requested leave \ndate.\nUnused annual leave may be carried forward to the next calendar year.\nManagers are responsible for approving leave requests."
+            }
+          ]
+        },
+        {
+          "query_id": "Q3",
+          "question": "How does the company handle third-party service providers and international data transfers?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.13441,
+              "text": "workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may violate \nthis policy should report the concern to their manager, HR, or another authorized \ncompany representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people who need the information to review or respond to the \nconcern. 7. No Retaliation Employees who raise a concern in good faith or participate \nin an investigation should not be subject to retaliation."
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.12394,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated with dignity, fairness, and respect. 2. Equal Treatment \nEmployees must be treated fairly regardless of their personal background, identity, or \nindividual characteristics. Employment decisions should be based on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted"
+            },
+            {
+              "rank": 3,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 2,
+              "score": 0.08511,
+              "text": "ys are separate from annual leave and are not deducted from an \nemployee's annual leave balance.\n6. Sick Leave\nSick leave is available according to company policy and applicable employment \nrequirements.\nEmployees should notify their manager as soon as possible when taking sick leave.\n7. Policy Version\nThis document is Company Leave Policy Version 5 and replaces the previous version \nof the leave policy.\nEOF"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 3,
+              "score": 0.07541,
+              "text": "e a concern in good faith or participate \nin an investigation should not be subject to retaliation. 8. Policy Version This \ndocument is Human Rights and Respectful Workplace Policy Version 1. EOF"
+            },
+            {
+              "rank": 5,
+              "file": "human_rights.pdf",
+              "chunk_index": 1,
+              "score": 0.04515,
+              "text": "ful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted in the workplace. Employees are expected to communicate professionally \nand respectfully with colleagues, managers, customers, and business partners. 4. \nDiscrimination The company does not tolerate unlawful discrimination in recruitment, \nemployment, compensation, promotion, training, or other workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may"
+            }
+          ]
+        },
+        {
+          "query_id": "Q4",
+          "question": "What rights do employees have to access, correct, or erase personal data?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.42897,
+              "text": "workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may violate \nthis policy should report the concern to their manager, HR, or another authorized \ncompany representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people who need the information to review or respond to the \nconcern. 7. No Retaliation Employees who raise a concern in good faith or participate \nin an investigation should not be subject to retaliation."
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.36671,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated with dignity, fairness, and respect. 2. Equal Treatment \nEmployees must be treated fairly regardless of their personal background, identity, or \nindividual characteristics. Employment decisions should be based on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 3,
+              "score": 0.32049,
+              "text": "e a concern in good faith or participate \nin an investigation should not be subject to retaliation. 8. Policy Version This \ndocument is Human Rights and Respectful Workplace Policy Version 1. EOF"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 1,
+              "score": 0.25682,
+              "text": "ful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted in the workplace. Employees are expected to communicate professionally \nand respectfully with colleagues, managers, customers, and business partners. 4. \nDiscrimination The company does not tolerate unlawful discrimination in recruitment, \nemployment, compensation, promotion, training, or other workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may"
+            },
+            {
+              "rank": 5,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 1,
+              "score": 0.20272,
+              "text": "mployees may carry forward up to 10 unused annual leave days into the following \ncalendar year.\nAny leave above the 10-day limit will expire at the end of the year.\n4. Leave Approval\nAll planned leave must be approved by the employee's reporting manager.\nFor leave exceeding 10 consecutive working days, approval from both the reporting \nmanager and HR is required.\n5. Public Holidays\n\n\nPublic holidays are separate from annual leave and are not deducted from an \nemployee's annual leave balance.\n6."
+            }
+          ]
+        },
+        {
+          "query_id": "Q5",
+          "question": "What security measures protect employee personal data?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.51366,
+              "text": "workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may violate \nthis policy should report the concern to their manager, HR, or another authorized \ncompany representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people who need the information to review or respond to the \nconcern. 7. No Retaliation Employees who raise a concern in good faith or participate \nin an investigation should not be subject to retaliation."
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.40555,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated with dignity, fairness, and respect. 2. Equal Treatment \nEmployees must be treated fairly regardless of their personal background, identity, or \nindividual characteristics. Employment decisions should be based on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 3,
+              "score": 0.40397,
+              "text": "e a concern in good faith or participate \nin an investigation should not be subject to retaliation. 8. Policy Version This \ndocument is Human Rights and Respectful Workplace Policy Version 1. EOF"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 1,
+              "score": 0.35233,
+              "text": "ful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted in the workplace. Employees are expected to communicate professionally \nand respectfully with colleagues, managers, customers, and business partners. 4. \nDiscrimination The company does not tolerate unlawful discrimination in recruitment, \nemployment, compensation, promotion, training, or other workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may"
+            },
+            {
+              "rank": 5,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 2,
+              "score": 0.188,
+              "text": "ys are separate from annual leave and are not deducted from an \nemployee's annual leave balance.\n6. Sick Leave\nSick leave is available according to company policy and applicable employment \nrequirements.\nEmployees should notify their manager as soon as possible when taking sick leave.\n7. Policy Version\nThis document is Company Leave Policy Version 5 and replaces the previous version \nof the leave policy.\nEOF"
+            }
+          ]
+        },
+        {
+          "query_id": "Q6",
+          "question": "What are the rules for sharing confidential company information?",
+          "top_chunks": [
+            {
+              "rank": 1,
+              "file": "human_rights.pdf",
+              "chunk_index": 2,
+              "score": 0.43334,
+              "text": "workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may violate \nthis policy should report the concern to their manager, HR, or another authorized \ncompany representative. 6. Confidentiality Reports will be handled responsibly and \nshared only with people who need the information to review or respond to the \nconcern. 7. No Retaliation Employees who raise a concern in good faith or participate \nin an investigation should not be subject to retaliation."
+            },
+            {
+              "rank": 2,
+              "file": "human_rights.pdf",
+              "chunk_index": 1,
+              "score": 0.2842,
+              "text": "ful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted in the workplace. Employees are expected to communicate professionally \nand respectfully with colleagues, managers, customers, and business partners. 4. \nDiscrimination The company does not tolerate unlawful discrimination in recruitment, \nemployment, compensation, promotion, training, or other workplace activities. 5. \nReporting Concerns Employees who experience or witness behavior that may"
+            },
+            {
+              "rank": 3,
+              "file": "human_rights.pdf",
+              "chunk_index": 0,
+              "score": 0.25861,
+              "text": "1. Purpose The company is committed to maintaining a workplace where every \nemployee is treated with dignity, fairness, and respect. 2. Equal Treatment \nEmployees must be treated fairly regardless of their personal background, identity, or \nindividual characteristics. Employment decisions should be based on qualifications, \nperformance, business needs, and applicable company policies. 3. Respectful \nWorkplace Harassment, bullying, intimidation, threats, and abusive behavior are not \npermitted"
+            },
+            {
+              "rank": 4,
+              "file": "human_rights.pdf",
+              "chunk_index": 3,
+              "score": 0.22394,
+              "text": "e a concern in good faith or participate \nin an investigation should not be subject to retaliation. 8. Policy Version This \ndocument is Human Rights and Respectful Workplace Policy Version 1. EOF"
+            },
+            {
+              "rank": 5,
+              "file": "company_policy_5.pdf",
+              "chunk_index": 2,
+              "score": 0.19264,
+              "text": "ys are separate from annual leave and are not deducted from an \nemployee's annual leave balance.\n6. Sick Leave\nSick leave is available according to company policy and applicable employment \nrequirements.\nEmployees should notify their manager as soon as possible when taking sick leave.\n7. Policy Version\nThis document is Company Leave Policy Version 5 and replaces the previous version \nof the leave policy.\nEOF"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

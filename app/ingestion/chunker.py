@@ -1,12 +1,12 @@
+
 from dataclasses import dataclass
-import re
 
 
 @dataclass
 class Chunk:
     """
-    A piece of a document along with metadata
-    needed later for retrieval and drift analysis.
+    A document chunk with metadata for retrieval
+    and version-drift analysis.
     """
 
     chunk_id: str
@@ -16,89 +16,73 @@ class Chunk:
     chunk_index: int
 
 
-def _split_long_paragraph(
-    paragraph: str,
+def _find_chunk_end(
+    text: str,
+    start: int,
     chunk_size: int,
-) -> list[str]:
+) -> int:
     """
-    Split a paragraph into smaller pieces.
+    Find a chunk boundary near chunk_size.
 
-    Sentences are kept together whenever possible.
-    Very long sentences are hard-split as a last resort.
+    Prefer paragraph, sentence, and word boundaries
+    over splitting text at an arbitrary character.
     """
+    target = min(start + chunk_size, len(text))
 
-    if len(paragraph) <= chunk_size:
-        return [paragraph]
+    if target == len(text):
+        return target
 
-    sentences = re.split(
-        r"(?<=[.!?])\s+",
-        paragraph,
-    )
+    # Avoid choosing a boundary too early in the chunk.
+    minimum = start + int(chunk_size * 0.60)
+    segment = text[minimum:target]
 
-    pieces: list[str] = []
-    current = ""
+    separators = ["\n\n", "\n", ". ", "? ", "! ", " "]
 
-    for sentence in sentences:
-        sentence = sentence.strip()
+    candidates = []
 
-        if not sentence:
-            continue
+    for separator in separators:
+        position = segment.rfind(separator)
 
-        if len(sentence) > chunk_size:
-            if current:
-                pieces.append(current)
-                current = ""
+        if position >= 0:
+            boundary = minimum + position + len(separator)
+            candidates.append(boundary)
 
-            for start in range(
-                0,
-                len(sentence),
-                chunk_size,
-            ):
-                pieces.append(
-                    sentence[start:start + chunk_size]
-                )
+    if candidates:
+        return max(candidates)
 
-            continue
-
-        candidate = (
-            f"{current} {sentence}"
-            if current
-            else sentence
-        )
-
-        if len(candidate) <= chunk_size:
-            current = candidate
-        else:
-            if current:
-                pieces.append(current)
-
-            current = sentence
-
-    if current:
-        pieces.append(current)
-
-    return pieces
+    return target
 
 
 def chunk_text(
     text: str,
     source: str,
     version: str,
-    chunk_size: int = 100,
+    chunk_size: int = 500,
+    overlap: int = 75,
 ) -> list[Chunk]:
     """
-    Split document text into retrieval-friendly chunks.
+    Split text into overlapping chunks.
 
-    Strategy:
-    - Preserve paragraphs when possible.
-    - Combine small paragraphs until chunk_size is reached.
-    - Split oversized paragraphs by sentence.
-    - Hard-split oversized sentences as a last resort.
+    Args:
+        text: Extracted document text.
+        source: Document identifier or source name.
+        version: Document version identifier.
+        chunk_size: Maximum characters per chunk.
+        overlap: Approximate characters shared between chunks.
+
+    Returns:
+        Chunks with stable metadata fields used by
+        retrieval and drift analysis.
     """
-
     if chunk_size <= 0:
+        raise ValueError("chunk_size must be greater than 0.")
+
+    if overlap < 0:
+        raise ValueError("overlap cannot be negative.")
+
+    if overlap >= chunk_size:
         raise ValueError(
-            "chunk_size must be greater than 0"
+            "overlap must be smaller than chunk_size."
         )
 
     text = text.strip()
@@ -106,67 +90,36 @@ def chunk_text(
     if not text:
         return []
 
-    paragraphs = [
-        paragraph.strip()
-        for paragraph in re.split(
-            r"\n\s*\n",
-            text,
-        )
-        if paragraph.strip()
-    ]
-
-    pieces: list[str] = []
-
-    for paragraph in paragraphs:
-        pieces.extend(
-            _split_long_paragraph(
-                paragraph,
-                chunk_size,
-            )
-        )
-
     chunks: list[Chunk] = []
+    start = 0
 
-    current_parts: list[str] = []
-    current_length = 0
+    while start < len(text):
+        end = _find_chunk_end(text, start, chunk_size)
+        chunk_content = text[start:end].strip()
 
-    for piece in pieces:
-        piece_length = len(piece)
-
-        if (
-            current_parts
-            and current_length + piece_length + 2
-            > chunk_size
-        ):
+        if chunk_content:
             chunk_index = len(chunks)
 
             chunks.append(
                 Chunk(
                     chunk_id=f"{source}-{chunk_index}",
-                    text="\n\n".join(current_parts),
+                    text=chunk_content,
                     source=source,
                     version=version,
                     chunk_index=chunk_index,
                 )
             )
 
-            current_parts = []
-            current_length = 0
+        if end >= len(text):
+            break
 
-        current_parts.append(piece)
-        current_length += piece_length + 2
+        # Start the next chunk before the previous one ended.
+        next_start = max(start + 1, end - overlap)
 
-    if current_parts:
-        chunk_index = len(chunks)
+        # Avoid beginning in the middle of whitespace.
+        while next_start < end and text[next_start].isspace():
+            next_start += 1
 
-        chunks.append(
-            Chunk(
-                chunk_id=f"{source}-{chunk_index}",
-                text="\n\n".join(current_parts),
-                source=source,
-                version=version,
-                chunk_index=chunk_index,
-            )
-        )
+        start = next_start
 
     return chunks

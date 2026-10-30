@@ -179,7 +179,8 @@ def test_upload_unsupported_file(
     assert response.status_code == 400
 
     assert response.json()["detail"] == (
-        "Only PDF and TXT files are supported."
+        "Unsupported file type: .exe. "
+        "Supported formats: PDF, TXT, DOCX, XLSX, XLS, CSV."
     )
 
 

@@ -20,6 +20,10 @@ class Settings:
             "LLM_MODEL",
             "openai/gpt-oss-20b",
         )
+        self.llm_fallback_model = os.getenv(
+            "LLM_FALLBACK_MODEL",
+            "llama-3.3-70b-versatile",
+        )
 
         self.api_host = os.getenv(
             "API_HOST",

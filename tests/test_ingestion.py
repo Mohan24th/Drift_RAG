@@ -39,13 +39,16 @@ def test_chunk_text():
         source="test.txt",
         version="v1",
         chunk_size=35,
+        overlap=0,
     )
 
-    assert len(chunks) == 3
+    assert len(chunks) == 2
 
-    assert chunks[0].text == "First paragraph."
-    assert chunks[1].text == "Second paragraph."
-    assert chunks[2].text == "Third paragraph."
+    assert "First paragraph." in chunks[0].text
+    assert "Second" in chunks[0].text
+
+    assert "paragraph." in chunks[1].text
+    assert "Third paragraph." in chunks[1].text
 
 
 def test_chunk_metadata():

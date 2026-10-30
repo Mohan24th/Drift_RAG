@@ -1,0 +1,66 @@
+{
+  "Q1": {
+    "company_policy_5.pdf::12": true,
+    "human_rights.pdf::2": true,
+    "human_rights.pdf::10": false,
+    "human_rights.pdf::12": true,
+    "human_rights.pdf::0": true,
+    "human_rights.pdf::1": true,
+    "company_policy_5.pdf::2": true,
+    "human_rights.pdf::3": true
+  },
+  "Q2": {
+    "human_rights.pdf::3": true,
+    "human_rights.pdf::5": true,
+    "human_rights.pdf::4": false,
+    "human_rights.pdf::6": true,
+    "human_rights.pdf::0": true,
+    "human_rights.pdf::1": true,
+    "human_rights.pdf::2": true,
+    "company_policy.pdf::0": true
+  },
+  "Q3": {
+    "human_rights.pdf::12": true,
+    "human_rights.pdf::8": true,
+    "company_policy_5.pdf::4": false,
+    "human_rights.pdf::4": false,
+    "human_rights.pdf::0": true,
+    "human_rights.pdf::2": true,
+    "company_policy_5.pdf::2": true,
+    "human_rights.pdf::3": true,
+    "human_rights.pdf::1": true
+  },
+  "Q4": {
+    "human_rights.pdf::2": true,
+    "human_rights.pdf::13": true,
+    "human_rights.pdf::12": true,
+    "human_rights.pdf::17": true,
+    "company_policy_5.pdf::12": true,
+    "human_rights.pdf::0": true,
+    "human_rights.pdf::3": true,
+    "human_rights.pdf::1": true,
+    "company_policy_5.pdf::1": true
+  },
+  "Q5": {
+    "human_rights.pdf::2": true,
+    "human_rights.pdf::10": true,
+    "human_rights.pdf::12": true,
+    "human_rights.pdf::0": true,
+    "human_rights.pdf::13": true,
+    "human_rights.pdf::3": true,
+    "human_rights.pdf::1": true,
+    "company_policy_5.pdf::2": true
+  },
+  "Q6": {
+    "human_rights.pdf::13": true,
+    "human_rights.pdf::12": true,
+    "company_policy_5.pdf::12": true,
+    "human_rights.pdf::4": true,
+    "human_rights.pdf::8": true,
+    "human_rights.pdf::2": true,
+    "human_rights.pdf::1": true,
+    "human_rights.pdf::0": true,
+    "human_rights.pdf::3": true,
+    "company_policy_5.pdf::2": true
+  }
+}

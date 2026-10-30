@@ -1,0 +1,123 @@
+{
+  "note": "Recall is relative to the pooled top-five candidates from both configurations, not every chunk in the corpus. Metrics depend on manual binary relevance judgments.",
+  "metrics": {
+    "100": {
+      "chunk_count": 50,
+      "per_query": [
+        {
+          "query_id": "Q1",
+          "precision_at_5": 0.8,
+          "pooled_recall_at_5": 0.5714,
+          "mrr": 1.0,
+          "ndcg_at_5": 0.8304,
+          "relevant_in_judged_pool": 7
+        },
+        {
+          "query_id": "Q2",
+          "precision_at_5": 0.8,
+          "pooled_recall_at_5": 0.5714,
+          "mrr": 1.0,
+          "ndcg_at_5": 0.8304,
+          "relevant_in_judged_pool": 7
+        },
+        {
+          "query_id": "Q3",
+          "precision_at_5": 0.6,
+          "pooled_recall_at_5": 0.4286,
+          "mrr": 1.0,
+          "ndcg_at_5": 0.6844,
+          "relevant_in_judged_pool": 7
+        },
+        {
+          "query_id": "Q4",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.5556,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 9
+        },
+        {
+          "query_id": "Q5",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.625,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 8
+        },
+        {
+          "query_id": "Q6",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.5,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 10
+        }
+      ],
+      "means": {
+        "precision_at_5": 0.8667,
+        "pooled_recall_at_5": 0.542,
+        "mrr": 1.0,
+        "ndcg_at_5": 0.8909
+      }
+    },
+    "500": {
+      "chunk_count": 11,
+      "per_query": [
+        {
+          "query_id": "Q1",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.7143,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 7
+        },
+        {
+          "query_id": "Q2",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.7143,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 7
+        },
+        {
+          "query_id": "Q3",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.7143,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 7
+        },
+        {
+          "query_id": "Q4",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.5556,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 9
+        },
+        {
+          "query_id": "Q5",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.625,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 8
+        },
+        {
+          "query_id": "Q6",
+          "precision_at_5": 1.0,
+          "pooled_recall_at_5": 0.5,
+          "mrr": 1.0,
+          "ndcg_at_5": 1.0,
+          "relevant_in_judged_pool": 10
+        }
+      ],
+      "means": {
+        "precision_at_5": 1.0,
+        "pooled_recall_at_5": 0.6372,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      }
+    }
+  }
+}

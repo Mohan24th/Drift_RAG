@@ -1,19 +1,41 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 
+# ML and embeddings
 sentence-transformers
-faiss-cpu
+torch
 numpy
+faiss-cpu
+
+# Document ingestion
 pypdf
+docling
+pymupdf
+pandas
+openpyxl
+xlrd
+python-docx
+
+# Database
 sqlalchemy
 psycopg[binary]
 pgvector
+
+# Configuration
 python-dotenv
+
+# LLM
 groq
+
+# FastAPI backend
 fastapi
 uvicorn
 python-multipart
+
+# Authentication and security
 python-jose[cryptography]
 bcrypt
 supabase
 
-torch
+# RAG evaluation
+ragas
+datasets

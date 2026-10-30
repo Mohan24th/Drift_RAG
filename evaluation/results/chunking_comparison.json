@@ -1,0 +1,162 @@
+{
+  "experiment": "Local PDF chunking comparison",
+  "note": "Same source PDFs; overlap is 20% of configured chunk size. This measures chunking characteristics, not retrieval quality.",
+  "documents": [
+    {
+      "file": "company_policy.pdf",
+      "extracted_characters": 297,
+      "configs": [
+        {
+          "chunk_size": 100,
+          "overlap": 20,
+          "chunk_count": 4,
+          "average_chunk_characters": 88.5,
+          "median_chunk_characters": 95.5,
+          "min_chunk_characters": 65,
+          "max_chunk_characters": 98,
+          "total_chunk_characters": 354
+        },
+        {
+          "chunk_size": 500,
+          "overlap": 100,
+          "chunk_count": 1,
+          "average_chunk_characters": 297,
+          "median_chunk_characters": 297,
+          "min_chunk_characters": 297,
+          "max_chunk_characters": 297,
+          "total_chunk_characters": 297
+        }
+      ]
+    },
+    {
+      "file": "company_policy_2.pdf",
+      "extracted_characters": 297,
+      "configs": [
+        {
+          "chunk_size": 100,
+          "overlap": 20,
+          "chunk_count": 4,
+          "average_chunk_characters": 88.5,
+          "median_chunk_characters": 95.5,
+          "min_chunk_characters": 65,
+          "max_chunk_characters": 98,
+          "total_chunk_characters": 354
+        },
+        {
+          "chunk_size": 500,
+          "overlap": 100,
+          "chunk_count": 1,
+          "average_chunk_characters": 297,
+          "median_chunk_characters": 297,
+          "min_chunk_characters": 297,
+          "max_chunk_characters": 297,
+          "total_chunk_characters": 297
+        }
+      ]
+    },
+    {
+      "file": "company_policy_3.pdf",
+      "extracted_characters": 326,
+      "configs": [
+        {
+          "chunk_size": 100,
+          "overlap": 20,
+          "chunk_count": 4,
+          "average_chunk_characters": 95.5,
+          "median_chunk_characters": 95.5,
+          "min_chunk_characters": 93,
+          "max_chunk_characters": 98,
+          "total_chunk_characters": 382
+        },
+        {
+          "chunk_size": 500,
+          "overlap": 100,
+          "chunk_count": 1,
+          "average_chunk_characters": 326,
+          "median_chunk_characters": 326,
+          "min_chunk_characters": 326,
+          "max_chunk_characters": 326,
+          "total_chunk_characters": 326
+        }
+      ]
+    },
+    {
+      "file": "company_policy_4.pdf",
+      "extracted_characters": 326,
+      "configs": [
+        {
+          "chunk_size": 100,
+          "overlap": 20,
+          "chunk_count": 4,
+          "average_chunk_characters": 95.5,
+          "median_chunk_characters": 95.5,
+          "min_chunk_characters": 93,
+          "max_chunk_characters": 98,
+          "total_chunk_characters": 382
+        },
+        {
+          "chunk_size": 500,
+          "overlap": 100,
+          "chunk_count": 1,
+          "average_chunk_characters": 326,
+          "median_chunk_characters": 326,
+          "min_chunk_characters": 326,
+          "max_chunk_characters": 326,
+          "total_chunk_characters": 326
+        }
+      ]
+    },
+    {
+      "file": "company_policy_5.pdf",
+      "extracted_characters": 1206,
+      "configs": [
+        {
+          "chunk_size": 100,
+          "overlap": 20,
+          "chunk_count": 16,
+          "average_chunk_characters": 92.75,
+          "median_chunk_characters": 98.0,
+          "min_chunk_characters": 31,
+          "max_chunk_characters": 99,
+          "total_chunk_characters": 1484
+        },
+        {
+          "chunk_size": 500,
+          "overlap": 100,
+          "chunk_count": 3,
+          "average_chunk_characters": 468,
+          "median_chunk_characters": 494,
+          "min_chunk_characters": 411,
+          "max_chunk_characters": 499,
+          "total_chunk_characters": 1404
+        }
+      ]
+    },
+    {
+      "file": "human_rights.pdf",
+      "extracted_characters": 1387,
+      "configs": [
+        {
+          "chunk_size": 100,
+          "overlap": 20,
+          "chunk_count": 18,
+          "average_chunk_characters": 94.61,
+          "median_chunk_characters": 95.0,
+          "min_chunk_characters": 88,
+          "max_chunk_characters": 99,
+          "total_chunk_characters": 1703
+        },
+        {
+          "chunk_size": 500,
+          "overlap": 100,
+          "chunk_count": 4,
+          "average_chunk_characters": 420.75,
+          "median_chunk_characters": 495.5,
+          "min_chunk_characters": 195,
+          "max_chunk_characters": 497,
+          "total_chunk_characters": 1683
+        }
+      ]
+    }
+  ]
+}

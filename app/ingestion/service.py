@@ -1,7 +1,7 @@
+
 from pathlib import Path
 
-from app.ingestion.loader import load_text_file
-from app.ingestion.pdf_loader import load_pdf
+from app.ingestion.loader import load_document
 from app.ingestion.chunker import Chunk, chunk_text
 
 
@@ -13,7 +13,6 @@ class IngestionService:
         version: str,
         chunk_size: int = 500,
     ) -> list[Chunk]:
-
         path = Path(file_path)
 
         if not path.exists():
@@ -21,19 +20,15 @@ class IngestionService:
                 f"File not found: {path}"
             )
 
-        suffix = path.suffix.lower()
-
-        if suffix == ".pdf":
-            text = load_pdf(path)
-
-        elif suffix == ".txt":
-            text = load_text_file(path)
-
-        else:
+        if not path.is_file():
             raise ValueError(
-                f"Unsupported file type: {suffix}"
+                f"Path is not a file: {path}"
             )
 
+        # Load the file according to its extension.
+        text = load_document(path)
+
+        # Preserve the existing chunking interface.
         return chunk_text(
             text=text,
             source=source,

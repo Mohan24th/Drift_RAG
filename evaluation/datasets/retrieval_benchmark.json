@@ -1,0 +1,58 @@
+{
+  "document_id": "795afba4-3b0a-4581-99bc-d04b7220b55e",
+  "versions": {
+    "1": "7f9dc295-cb58-4a3c-aa72-aa050ad67839",
+    "2": "7986525b-667e-4a80-8c8a-918125ba03f0"
+  },
+  "top_k": 5,
+  "queries": [
+    {
+      "id": "Q1",
+      "question": "What personal data can the company collect about employees?",
+      "relevant_chunk_indices": {
+        "1": [285, 44, 14],
+        "2": [379, 51, 21]
+      }
+    },
+    {
+      "id": "Q2",
+      "question": "What rules apply to using AI tools at work?",
+      "relevant_chunk_indices": {
+        "1": [354, 179, 177, 356],
+        "2": [730, 549, 471, 742, 741]
+      }
+    },
+    {
+      "id": "Q3",
+      "question": "How does the company handle third-party service providers and international data transfers?",
+      "relevant_chunk_indices": {
+        "1": [529, 527, 528, 558, 530],
+        "2": [827, 825, 826, 856, 828]
+      }
+    },
+    {
+      "id": "Q4",
+      "question": "What rights do employees have to access, correct, or erase personal data?",
+      "relevant_chunk_indices": {
+        "1": [597, 598, 596],
+        "2": [990, 895, 989, 991]
+      }
+    },
+    {
+      "id": "Q5",
+      "question": "What security measures protect employee personal data?",
+      "relevant_chunk_indices": {
+        "1": [653, 654, 655],
+        "2": [951, 952, 953]
+      }
+    },
+    {
+      "id": "Q6",
+      "question": "What are the rules for sharing confidential company information?",
+      "relevant_chunk_indices": {
+        "1": [576, 577, 368],
+        "2": [874, 875, 563]
+      }
+    }
+  ]
+}

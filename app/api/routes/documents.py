@@ -367,16 +367,25 @@ async def upload_document_version(
         original_filename
     ).suffix.lower()
 
-    if suffix not in {
+    supported_extensions = {
         ".pdf",
         ".txt",
-    }:
+        ".docx",
+        ".xlsx",
+        ".xls",
+        ".csv",
+    }
+
+    if suffix not in supported_extensions:
         raise HTTPException(
             status_code=400,
             detail=(
-                "Only PDF and TXT files are supported."
+                f"Unsupported file type: {suffix}. "
+                "Supported formats: PDF, TXT, DOCX, "
+                "XLSX, XLS, CSV."
             ),
         )
+
 
     upload_temp_path = None
     ingestion_temp_path = None
