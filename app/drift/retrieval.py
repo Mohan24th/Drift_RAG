@@ -22,6 +22,7 @@ class DriftRetriever:
             query=query,
             top_k=top_k,
             version_id=version_id,
+            allow_unapproved_version=True,
         )
 
         return [

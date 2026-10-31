@@ -1,4 +1,3 @@
-
 from app.drift.report import DriftChange, DriftReport
 from app.drift.semantic import SemanticDrift
 
@@ -13,8 +12,9 @@ class DriftAnalyzer:
         self.semantic_detector = semantic_detector
 
     def analyze(self, query, v1_results, v2_results) -> DriftReport:
-        v1_chunks = [chunk for chunk, _ in v1_results]
-        v2_chunks = [chunk for chunk, _ in v2_results]
+        # Access first element to be compatible with both (chunk, score) and (chunk, version, doc, score)
+        v1_chunks = [res[0] for res in v1_results]
+        v2_chunks = [res[0] for res in v2_results]
 
         candidates = []
 
@@ -53,8 +53,10 @@ class DriftAnalyzer:
 
         if matches:
             max_rank = max(len(v1_chunks), len(v2_chunks), 1)
+            # FIX: Use one-based ranks (i+1, j+1) for the calculation.
+            # formula: sum(abs((i+1) - (j+1)) / max_rank) / len(matches)
             rank_change = sum(
-                abs(i - j) / max_rank for i, j, _ in matches
+                abs((i + 1) - (j + 1)) / max_rank for i, j, _ in matches
             ) / len(matches)
         else:
             rank_change = 0.0

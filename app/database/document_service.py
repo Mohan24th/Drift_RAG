@@ -31,7 +31,7 @@ class DocumentService:
         file_path: str,
         document_name: str,
         version_number: int,
-        chunk_size: int = 500,
+        chunk_size: int | None = None,
     ):
         path = Path(file_path)
 

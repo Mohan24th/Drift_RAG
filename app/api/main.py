@@ -1,11 +1,9 @@
 import logging
-
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
-
 
 from app.api.routes import (
     auth,
@@ -14,7 +12,8 @@ from app.api.routes import (
     query,
 )
 from app.config import settings
-
+from app.retrieval.embeddings import EmbeddingModel
+from app.generation.llm import LLM
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,6 +27,29 @@ logging.basicConfig(
 
 logger = logging.getLogger("drift-rag")
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # --- Startup ---
+    logger.info("Initializing shared resources...")
+    try:
+        # Load embedding model once for the application process
+        app.state.embedding_model = EmbeddingModel()
+        logger.info("Embedding model loaded successfully.")
+        
+        # Load LLM client once
+        app.state.llm = LLM()
+        logger.info("LLM client initialized successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize shared resources: {e}")
+        raise RuntimeError(f"Application failed to start: {e}")
+    
+    yield
+    
+    # --- Shutdown ---
+    logger.info("Shutting down resources...")
+    # Clear references to help GC
+    app.state.embedding_model = None
+    app.state.llm = None
 
 app = FastAPI(
     title="Drift RAG API",
@@ -36,8 +58,8 @@ app = FastAPI(
         "and knowledge drift detection API."
     ),
     version="1.0.0",
+    lifespan=lifespan,
 )
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,7 +68,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(
@@ -60,7 +81,6 @@ async def http_exception_handler(
             "detail": exc.detail,
         },
     )
-
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(
@@ -80,7 +100,6 @@ async def unhandled_exception_handler(
             "detail": "An unexpected error occurred.",
         },
     )
-
 
 app.include_router(
     documents.router,
@@ -106,7 +125,6 @@ app.include_router(
     tags=["Authentication"],
 )
 
-
 @app.get(
     "/health",
     tags=["Health"],
@@ -117,16 +135,13 @@ def health_check():
         "service": "drift-rag",
     }
 
-
 @app.get(
     "/ready",
     tags=["Health"],
 )
 def readiness_check():
-
     try:
         from sqlalchemy import text
-
         from app.database.connection import engine
 
         with engine.connect() as connection:

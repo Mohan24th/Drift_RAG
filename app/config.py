@@ -1,10 +1,11 @@
 import os
-
+from pathlib import Path
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
+# Establish project root for relative paths
+PROJECT_ROOT = Path(__file__).parent.parent
 
 class Settings:
     def __init__(self):
@@ -15,6 +16,7 @@ class Settings:
             "EMBEDDING_MODEL",
             "all-MiniLM-L6-v2",
         )
+        self.embedding_device = os.getenv("EMBEDDING_DEVICE", "cpu")
 
         self.llm_model = os.getenv(
             "LLM_MODEL",
@@ -24,6 +26,14 @@ class Settings:
             "LLM_FALLBACK_MODEL",
             "llama-3.3-70b-versatile",
         )
+        self.llm_timeout = float(os.getenv("LLM_TIMEOUT", "30.0"))
+        self.llm_max_retries = int(os.getenv("LLM_MAX_RETRIES", "1"))
+
+        self.chunk_size = int(os.getenv("CHUNK_SIZE", "500"))
+        self.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "75"))
+
+        self.db_pool_size = int(os.getenv("DB_POOL_SIZE", "20"))
+        self.db_max_overflow = int(os.getenv("DB_MAX_OVERFLOW", "10"))
 
         self.api_host = os.getenv(
             "API_HOST",
@@ -72,6 +82,8 @@ class Settings:
         self.jwt_secret_key = os.getenv(
             "JWT_SECRET_KEY"
         )
+        
+        self.prompt_path = PROJECT_ROOT / "prompts" / "rag_system_prompt.txt"
 
         if not self.jwt_secret_key:
             raise RuntimeError(
@@ -100,6 +112,5 @@ class Settings:
                     "SUPABASE_SERVICE_KEY is required "
                     "when DOCUMENT_STORAGE=supabase"
                 )
-
 
 settings = Settings()

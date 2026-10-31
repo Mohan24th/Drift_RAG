@@ -472,12 +472,20 @@ async def upload_document_version(
                 missing_ok=True
             )
 
+        # FIX: Only delete ingestion_temp_path if the storage implementation 
+        # created a temporary file (e.g. Supabase download).
+        # For LocalDocumentStorage, this path is the permanent file.
+        # We must determine if the storage was local or remote.
+        # A safer approach is to let the storage implementation decide 
+        # if a path is temporary or to check if it's in the system temp dir.
+        # For now, we check if it's a temporary file path.
         if ingestion_temp_path:
-            Path(
-                ingestion_temp_path
-            ).unlink(
-                missing_ok=True
-            )
+            path = Path(ingestion_temp_path)
+            # Check if the path is in the system's temporary directory.
+            # This ensures permanent files (like LocalDocumentStorage) are not deleted.
+            import tempfile
+            if path.parent == Path(tempfile.gettempdir()):
+                path.unlink(missing_ok=True)
 
         await file.close()
 

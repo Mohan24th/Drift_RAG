@@ -1,7 +1,5 @@
 from sentence_transformers import SentenceTransformer
-
 from app.config import settings
-
 
 class EmbeddingModel:
     def __init__(
@@ -11,7 +9,7 @@ class EmbeddingModel:
         self.model = SentenceTransformer(
             model_name
             or settings.embedding_model,
-            device="cpu",
+            device=settings.embedding_device,
         )
 
     def encode(

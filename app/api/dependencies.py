@@ -1,6 +1,5 @@
 from collections.abc import Generator
-
-from fastapi import Depends
+from fastapi import Depends, Request
 from sqlalchemy.orm import Session
 
 from app.database.connection import SessionLocal
@@ -16,29 +15,30 @@ from app.generation.qa import RAGAnswerer
 from app.generation.service import RAGService
 from app.ingestion.service import IngestionService
 from app.retrieval.embeddings import EmbeddingModel
+from app.retrieval.hybrid_retriever import HybridRetriever
 from app.retrieval.pg_retriever import PgRetriever
-
 
 def get_db() -> Generator[Session, None, None]:
     session = SessionLocal()
-
     try:
         yield session
     finally:
         session.close()
 
+def get_embedding_model(request: Request) -> EmbeddingModel:
+    # Pull the pre-loaded model from application state
+    return request.app.state.embedding_model
 
-def get_embedding_model() -> EmbeddingModel:
-    return EmbeddingModel()
-
+def get_llm(request: Request) -> LLM:
+    # Pull the pre-loaded LLM client from application state
+    return request.app.state.llm
 
 def get_document_service(
+    request: Request,
     session: Session = Depends(get_db),
-    embedding_model: EmbeddingModel = Depends(
-        get_embedding_model
-    ),
 ) -> DocumentService:
-
+    embedding_model = get_embedding_model(request)
+    
     return DocumentService(
         repository=DocumentRepository(
             session=session
@@ -48,40 +48,35 @@ def get_document_service(
         session=session,
     )
 
-
 def get_rag_service(
+    request: Request,
     session: Session = Depends(get_db),
-    embedding_model: EmbeddingModel = Depends(
-        get_embedding_model
-    ),
-    document_service: DocumentService = Depends(
-        get_document_service
-    ),
 ) -> RAGService:
-
-    retriever = PgRetriever(
+    embedding_model = get_embedding_model(request)
+    llm = get_llm(request)
+    
+    vector_retriever = PgRetriever(
         session=session,
         embedding_model=embedding_model,
     )
+    retriever = HybridRetriever(vector_retriever)
 
     answerer = RAGAnswerer(
         retriever=retriever,
-        llm=LLM(),
+        llm=llm,
     )
 
     return RAGService(
-        document_service=document_service,
+        document_service=Depends(get_document_service),
         answerer=answerer,
     )
 
-
 def get_drift_service(
+    request: Request,
     session: Session = Depends(get_db),
-    embedding_model: EmbeddingModel = Depends(
-        get_embedding_model
-    ),
 ) -> DriftService:
-
+    embedding_model = get_embedding_model(request)
+    
     retriever = PgRetriever(
         session=session,
         embedding_model=embedding_model,

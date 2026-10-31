@@ -31,13 +31,15 @@ class SourceResponse(BaseModel):
     document_name: str
     version_number: int
     chunk_index: int
-    score: float
+    score: float | None
     text: str
+    rrf_score: float | None = None
 
 
 class QueryResponse(BaseModel):
     answer: str
     sources: list[SourceResponse]
+    model_used: str | None = None
 
 
 @router.post(
@@ -79,9 +81,11 @@ def query_document(
                     chunk_index=source.chunk_index,
                     score=source.score,
                     text=source.text,
+                    rrf_score=source.rrf_score,
                 )
                 for source in response.sources
             ],
+            model_used=response.model_used,
         )
 
     except ValueError as exc:

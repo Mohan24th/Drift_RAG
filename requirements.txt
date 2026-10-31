@@ -19,6 +19,7 @@ python-docx
 sqlalchemy
 psycopg[binary]
 pgvector
+rank-bm25
 
 # Configuration
 python-dotenv

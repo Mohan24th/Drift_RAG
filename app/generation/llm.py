@@ -1,24 +1,21 @@
-
 import logging
-
-from groq import Groq
-
+import time
+from groq import Groq, APIError, RateLimitError
 from app.config import settings
 
 logger = logging.getLogger(__name__)
-
 
 class LLM:
     def __init__(
         self,
         model: str | None = None,
         fallback_model: str | None = None,
-        timeout: float = 30.0,
+        timeout: float | None = None,
     ):
         self.client = Groq(
             api_key=settings.groq_api_key,
-            timeout=timeout,
-            max_retries=1,
+            timeout=timeout if timeout is not None else settings.llm_timeout,
+            max_retries=settings.llm_max_retries,
         )
 
         self.model = model or settings.llm_model
@@ -45,47 +42,74 @@ class LLM:
 
         return content.strip()
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str) -> tuple[str, str]:
+        """
+        Generates an answer and returns a tuple of (answer, model_used).
+        """
         if not prompt or not prompt.strip():
             raise ValueError("Prompt cannot be empty.")
 
+        start_time = time.perf_counter()
+        
         try:
-            return self._call_model(prompt, self.model)
+            # Attempt Primary Model
+            answer = self._call_model(prompt, self.model)
+            latency = time.perf_counter() - start_time
+            
+            logger.info(
+                "LLM Success | Model: %s | Role: primary | Latency: %.4fs | Fallback: No",
+                self.model, latency
+            )
+            return answer, self.model
 
-        except Exception as primary_error:
+        except (APIError, RateLimitError) as transient_error:
+            # Transient failures trigger fallback
+            latency_primary = time.perf_counter() - start_time
             logger.warning(
-                "Primary LLM failed (%s): %s",
-                self.model,
-                type(primary_error).__name__,
+                "LLM Transient Failure | Model: %s | Error: %s | Latency: %.4fs | Attempting Fallback...",
+                self.model, type(transient_error).__name__, latency_primary
             )
 
-        if (
-            self.fallback_model
-            and self.fallback_model != self.model
-        ):
-            try:
-                logger.info(
-                    "Attempting fallback LLM: %s",
-                    self.fallback_model,
-                )
-                return self._call_model(
-                    prompt,
-                    self.fallback_model,
-                )
+            if (
+                self.fallback_model
+                and self.fallback_model != self.model
+            ):
+                try:
+                    start_fallback = time.perf_counter()
+                    answer = self._call_model(prompt, self.fallback_model)
+                    latency_fallback = time.perf_counter() - start_fallback
+                    
+                    logger.info(
+                        "LLM Fallback Success | Model: %s | Role: fallback | Latency: %.4fs",
+                        self.fallback_model, latency_fallback
+                    )
+                    return answer, self.fallback_model
 
-            except Exception as fallback_error:
-                logger.error(
-                    "Fallback LLM failed (%s): %s",
-                    self.fallback_model,
-                    type(fallback_error).__name__,
-                )
+                except Exception as fallback_error:
+                    logger.error(
+                        "LLM Fallback Failed | Model: %s | Error: %s",
+                        self.fallback_model, type(fallback_error).__name__,
+                    )
+                    raise RuntimeError(
+                        "Both primary and fallback LLM requests failed. "
+                        "Check model availability, API quota, and connectivity."
+                    ) from fallback_error
 
-                raise RuntimeError(
-                    "Both primary and fallback LLM requests failed. "
-                    "Check model availability, API quota, and connectivity."
-                ) from fallback_error
+            raise RuntimeError(
+                "Primary LLM transient failure and no distinct fallback model configured."
+            ) from transient_error
 
-        raise RuntimeError(
-            "Primary LLM request failed and no distinct fallback model "
-            "is configured."
-        ) from primary_error
+        except Exception as permanent_error:
+            # Permanent errors (e.g. ValueError) do not trigger fallback
+            latency = time.perf_counter() - start_time
+            logger.error(
+                "LLM Permanent Failure | Model: %s | Error: %s | Latency: %.4fs | Fallback: Skipped",
+                self.model, type(permanent_error).__name__, latency
+            )
+            
+            if isinstance(permanent_error, ValueError):
+                raise permanent_error
+                
+            raise RuntimeError(
+                f"LLM permanent failure: {str(permanent_error)}"
+            ) from permanent_error
